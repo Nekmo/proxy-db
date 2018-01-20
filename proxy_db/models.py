@@ -30,6 +30,7 @@ class Proxy(Base):
 
     id = Column(String(255), primary_key=True)
     votes = Column(Integer, default=0)
+    country = Column(String(5))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     on_provider_at = Column(DateTime(timezone=True))
