@@ -9,8 +9,10 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+from proxy_db.countries import ip_country
 from proxy_db.db import get_or_create
 from proxy_db.models import create_session, Proxy, ProviderRequest
+from proxy_db.utils import get_domain
 
 try:
     import lxml
@@ -87,6 +89,8 @@ class Provider(object):
         for proxy in proxies:
             instance, exists = get_or_create(session, Proxy, defaults=dict(votes=0),
                                              id='http://{}'.format(proxy['proxy']))
+            if not instance.country:
+                instance.country = ip_country(get_domain(instance.id))
             instance.votes += UPDATE_VOTES
         session.commit()
         return proxies

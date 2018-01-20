@@ -4,7 +4,6 @@
 
 import click
 
-from proxy_db.providers import ProxyNovaCom
 from proxy_db.proxies import ProxiesList
 
 
@@ -14,4 +13,4 @@ def main(args=None):
     click.echo("Replace this message by putting your code into "
                "proxy_db.cli.main")
     click.echo("See click documentation at http://click.pocoo.org/")
-    print(next(ProxiesList(country='cl')))
+    print(next(ProxiesList(country='CL')))

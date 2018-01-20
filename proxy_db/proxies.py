@@ -39,6 +39,8 @@ class ProxiesList(object):
 
     def __next__(self):
         proxy = self.find_db_proxy()
-        if not proxy:
+        if proxy:
+            return proxy
+        else:
             self.reload_provider()
         return next(self)
