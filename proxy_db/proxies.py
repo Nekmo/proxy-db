@@ -5,6 +5,8 @@ from proxy_db.providers import PROVIDERS
 
 class ProxiesList(object):
     def __init__(self, country=None):
+        if isinstance(country, str):
+            country = country.upper()
         self.request_options = dict(
             country=country,
         )
@@ -15,7 +17,7 @@ class ProxiesList(object):
 
     def find_db_proxy(self):
         query = create_session().query(Proxy).filter(Proxy.votes > 0)
-        query = query.filter(~Proxy.id.in_(self._excluded_proxies())).order_by(Proxy.votes)
+        query = query.filter(~Proxy.id.in_(self._excluded_proxies())).order_by(Proxy.votes.desc())
         country = self.request_options['country']
         if country:
             query = query.filter_by(country=country)
@@ -40,6 +42,7 @@ class ProxiesList(object):
     def __next__(self):
         proxy = self.find_db_proxy()
         if proxy:
+            self._proxies.add(proxy)
             return proxy
         else:
             self.reload_provider()

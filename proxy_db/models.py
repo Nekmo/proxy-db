@@ -4,6 +4,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
 PROXY_DB_FILE = os.environ.get('PROXY_DB_FILE', os.path.expanduser('~/.local/var/lib/proxy-db/db.sqlite3'))
+PROXY_DB_DB_URL = os.environ.get('PROXY_DB_DB_URL', 'sqlite:///{}'.format(PROXY_DB_FILE))
+PROTOCOLS = ['http', 'https']
+
 
 Base = declarative_base()
 
@@ -35,12 +38,45 @@ class Proxy(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     on_provider_at = Column(DateTime(timezone=True))
 
+    def vote(self, vote):
+        session = create_session()
+        instance = session.query(Proxy).filter_by(id=self.id).first()
+        instance.votes += vote
+        session.commit()
+
+    def positive(self):
+        self.vote(1)
+
+    def negative(self):
+        self.vote(-1)
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def __contains__(self, item):
+        return item in PROTOCOLS
+
+    def __getitem__(self, item):
+        if item not in PROTOCOLS:
+            raise KeyError
+        return self.id
+
+    def copy(self):
+        return {key: self.id for key in PROTOCOLS}
+
+    def __str__(self):
+        return self.id
+
 
 proxy_db_dir = os.path.dirname(PROXY_DB_FILE)
 if not os.path.lexists(proxy_db_dir):
     os.makedirs(proxy_db_dir)
 
-engine = create_engine('sqlite:///{}'.format(PROXY_DB_FILE), echo=True)
+engine = create_engine(PROXY_DB_DB_URL,
+                       connect_args={'check_same_thread': False} if PROXY_DB_DB_URL.startswith('sqlite://') else {})
 Base.metadata.create_all(engine)
 
 
@@ -52,4 +88,3 @@ session_maker = create_session_maker()
 
 def create_session():
     return session_maker()
-
