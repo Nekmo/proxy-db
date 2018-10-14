@@ -1,7 +1,6 @@
-========
-proxy-db
-========
+.. image:: https://raw.githubusercontent.com/Nekmo/proxy-db/master/images/proxy-db.png
 
+|
 
 .. image:: https://img.shields.io/travis/Nekmo/proxy-db.svg?style=flat-square&maxAge=2592000
   :target: https://travis-ci.org/Nekmo/proxy-db
@@ -26,6 +25,11 @@ proxy-db
 .. image:: https://img.shields.io/requires/github/Nekmo/proxy-db.svg?style=flat-square
      :target: https://requires.io/github/Nekmo/proxy-db/requirements/?branch=master
      :alt: Requirements Status
+
+
+========
+proxy-db
+========
 
 
 Manage free and private proxies on local db for Python Projects. Each proxy has a score according to how it works.
@@ -59,7 +63,7 @@ Proxy-db will return the best proxies first (more positive votes). You can also 
 
 Free proxies providers included:
 
-    * ProxyNova
+* ProxyNova
 
 
 Install
