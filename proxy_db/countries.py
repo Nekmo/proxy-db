@@ -18,6 +18,18 @@ COUNTRIES_FILE = os.environ.get('COUNTRIES_FILE', os.path.expanduser('~/.local/v
 GEOLINE_FILE_NAME = 'GeoLite2-Country.mmdb'
 
 
+def extract_file_to(tar, member_path, to):
+    obj = tar.extractfile(member_path)
+    if sys.version_info >= (3, 3):
+        with obj as member:
+            with open(to, 'wb') as f:
+                f.write(member.read())
+    else:
+        with open(to, 'wb') as f:
+            f.write(obj.read())
+            obj.close()
+
+
 def reload_countries_db():
     proxy_db_dir = os.path.dirname(COUNTRIES_FILE)
     if not os.path.lexists(proxy_db_dir):
@@ -26,10 +38,7 @@ def reload_countries_db():
     tar_file = download_file(COUNTRIES_DOWNLOAD_URL, tempfile.NamedTemporaryFile().name)
     tar = tarfile.open(tar_file, "r:gz")
     member_path = next(filter(lambda x: x.endswith(GEOLINE_FILE_NAME), tar.getnames()))
-    obj = tar.extractfile(member_path)
-    with obj as member:
-        with open(COUNTRIES_FILE, 'wb') as f:
-            f.write(member.read())
+    extract_file_to(tar, member_path, COUNTRIES_FILE)
     tar.close()
     os.remove(tar_file)
 
