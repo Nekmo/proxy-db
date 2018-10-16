@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import os
+import sys
 import tarfile
 import tempfile
 
@@ -7,6 +8,10 @@ import geoip2.database
 from geoip2.errors import AddressNotFoundError
 
 from proxy_db.utils import download_file
+
+if sys.version_info < (3, 0):
+    from itertools import ifilter as filter
+
 
 COUNTRIES_DOWNLOAD_URL = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz'
 COUNTRIES_FILE = os.environ.get('COUNTRIES_FILE', os.path.expanduser('~/.local/var/lib/proxy-db/countries.mmdb'))
