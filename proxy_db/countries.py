@@ -18,6 +18,9 @@ COUNTRIES_FILE = os.environ.get('COUNTRIES_FILE', os.path.expanduser('~/.local/v
 GEOLINE_FILE_NAME = 'GeoLite2-Country.mmdb'
 
 
+reader = None
+
+
 def extract_file_to(tar, member_path, to):
     obj = tar.extractfile(member_path)
     if sys.version_info >= (3, 3):
@@ -50,13 +53,12 @@ def init_reader():
 
 
 def ip_country(ip):
+    global reader
+    if reader is None:
+        reader = init_reader()
     try:
         country = reader.country(ip)
     except AddressNotFoundError:
         return ''
     else:
         return country.country.iso_code
-
-
-if os.environ.get('TOX_ENV_NAME') or os.environ.get('NOT_DOWNLOAD_PROXY_COUNTRIES'):
-    reader = init_reader()
