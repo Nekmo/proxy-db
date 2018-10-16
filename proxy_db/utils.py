@@ -1,5 +1,6 @@
+from __future__ import absolute_import
 import requests
-from urllib.parse import urlparse
+from proxy_db._compat import urlparse
 
 
 def download_file(url, local_filename=None):

@@ -3,6 +3,7 @@ https://github.com/constverum/ProxyBroker/blob/master/proxybroker/providers.py
 
 
 """
+from __future__ import absolute_import
 import copy
 import datetime
 import re
