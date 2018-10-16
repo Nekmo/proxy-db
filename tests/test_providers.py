@@ -3,7 +3,7 @@
 
 """Tests for `proxy-db` package."""
 import unittest
-from unittest.mock import Mock, patch
+from ._compat import Mock, patch
 
 from proxy_db.providers import ProxyNovaCom
 
