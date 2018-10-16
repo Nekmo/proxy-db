@@ -58,4 +58,5 @@ def ip_country(ip):
         return country.country.iso_code
 
 
-reader = init_reader()
+if os.environ.get('TOX_ENV_NAME') or os.environ.get('NOT_DOWNLOAD_PROXY_COUNTRIES'):
+    reader = init_reader()
