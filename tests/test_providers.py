@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """Tests for `proxy-db` package."""
+import datetime
 import unittest
+
+import requests_mock
+
 from ._compat import Mock, patch
 
-from proxy_db.providers import ProxyNovaCom, Provider
+from proxy_db.providers import ProxyNovaCom, Provider, ProviderRequestBase, PROVIDER_REQUIRES_UPDATE_MINUTES
 
 URL = 'https://domain.com/'
 PROVIDER_HTML = """
@@ -30,6 +34,48 @@ PROXY_NOVA_HTML = """
         </td>
     </tr>
 """
+
+
+class TestProviderRequestBase(unittest.TestCase):
+    url = URL
+
+    @patch('proxy_db.providers.create_session')
+    @patch('proxy_db.providers.ProviderRequestBase.get_or_create')
+    def test_now(self, m2, m1):
+        session_mock = requests_mock.Mocker()
+        session_mock.start()
+        req_mock = session_mock.get(self.url, text=PROVIDER_HTML)
+        self.get_provider_request().now()
+        self.assertTrue(req_mock.called_once)
+        session_mock.stop()
+        m1.return_value.commit.assert_called()
+        m2.assert_called_with(m1.return_value, {'results': 2})
+
+    def test_requires_update(self):
+        instance = Mock()
+        instance.updated_at = datetime.datetime.now() - datetime.timedelta(minutes=PROVIDER_REQUIRES_UPDATE_MINUTES)
+        instance.updated_at -= datetime.timedelta(minutes=1)
+        with patch('proxy_db.providers.ProviderRequestBase.get_or_create', return_value=(instance, True)):
+            self.assertTrue(self.get_provider_request().requires_update())
+
+    def test_requires_update_not_exists(self):
+        self.assertTrue(self.get_provider_request().requires_update())
+
+    def test_get_or_create(self):
+        request_provider = self.get_provider_request()
+        instance, _ = request_provider.get_or_create()
+        self.assertEqual(instance.results, 0)
+        self.assertEqual(instance.request_id, request_provider.id)
+        self.assertEqual(instance.provider, request_provider.provider.name)
+
+    def get_provider(self):
+        return Provider(self.url)
+
+    def get_provider_request(self):
+        return ProviderRequestBase(self.get_provider(), self.url, options={'country': 'es', 'spam': 1})
+
+    def test_id(self):
+        self.assertEqual(self.get_provider_request().id, 'es-1')
 
 
 class TestProvider(unittest.TestCase):
