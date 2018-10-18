@@ -30,6 +30,7 @@ class ProviderRequest(Base):
 
 class Proxy(Base):
     __tablename__ = 'proxies'
+    _proxies_list = None
 
     id = Column(String(255), primary_key=True)
     votes = Column(Integer, default=0)
@@ -55,6 +56,9 @@ class Proxy(Base):
             return self[key]
         except KeyError:
             return default
+
+    def set_proxies_list(self, proxies_list):
+        self._proxies_list = proxies_list
 
     def __contains__(self, item):
         return item in PROTOCOLS
