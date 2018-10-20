@@ -14,7 +14,7 @@
   :target: https://pypi.org/project/proxy-db/
   :alt: Python versions
 
-.. image:: https://img.shields.io/codeclimate/github/Nekmo/proxy-db.svg?style=flat-square
+.. image:: https://img.shields.io/codeclimate/maintainability/Nekmo/proxy-db.svg?style=flat-square
   :target: https://codeclimate.com/github/Nekmo/proxy-db
   :alt: Code Climate
 
