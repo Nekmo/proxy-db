@@ -2,7 +2,7 @@
 
 |
 
-.. image:: https://img.shields.io/travis/Nekmo/proxy-db.svg?style=flat-square&maxAge=2592000
+.. image:: https://img.shields.io/travis/Nekmo/proxy-db.svg?style=flat-square
   :target: https://travis-ci.org/Nekmo/proxy-db
   :alt: Latest Travis CI build status
 
