@@ -3,6 +3,8 @@
 
 """The setup script."""
 
+PACKAGE = 'proxy_db'
+
 from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
@@ -26,9 +28,12 @@ test_requirements = [
     # TODO: put package test requirements here
 ]
 
+package_version = __import__(PACKAGE).__version__
+
+
 setup(
     name='proxy-db',
-    version='0.1.0',
+    version=package_version,
     description="Manage free and private proxies on local db for Python Projects.",
     long_description=readme + '\n\n' + history,
     author="Nekmo Com",
@@ -51,12 +56,12 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     test_suite='tests',
     tests_require=test_requirements,
