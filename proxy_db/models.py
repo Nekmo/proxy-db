@@ -39,9 +39,18 @@ class Proxy(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     on_provider_at = Column(DateTime(timezone=True))
 
+    def get_updated_proxy(self, session=None):
+        """
+        :param session:
+        :return:
+        :rtype: Proxy
+        """
+        session = session or create_session()
+        return session.query(Proxy).filter_by(id=self.id).first()
+
     def vote(self, vote):
         session = create_session()
-        instance = session.query(Proxy).filter_by(id=self.id).first()
+        instance = self.get_updated_proxy(session)
         instance.votes += vote
         session.commit()
 
