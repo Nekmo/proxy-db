@@ -5,7 +5,7 @@ import logging
 
 __author__ = """Nekmo Com"""
 __email__ = 'contacto@nekmo.com'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 logging.basicConfig()
 logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
