@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Manage free and private proxies on local db for Python Projects.
 """
+import copy
 import os
 import glob
 from itertools import chain
@@ -105,7 +106,7 @@ status_name = ['Planning', 'Pre-Alpha', 'Alpha', 'Beta',
                'Production/Stable', 'Mature', 'Inactive'][STATUS_LEVEL - 1]
 
 # Classifiers
-classifiers = CLASSIFIERS.copy()
+classifiers = copy.copy(CLASSIFIERS)
 classifiers.extend(get_python_classifiers(python_versions))
 classifiers.extend(chain(*[get_platform_classifiers(platform) for platform in PLATFORMS]))
 classifiers.extend([
