@@ -1,3 +1,5 @@
+import six
+
 from proxy_db.exceptions import NoProvidersAvailable
 from proxy_db.models import Proxy, create_session
 from proxy_db.providers import PROVIDERS
@@ -5,7 +7,7 @@ from proxy_db.providers import PROVIDERS
 
 class ProxiesList(object):
     def __init__(self, country=None):
-        if isinstance(country, str):
+        if isinstance(country, six.string_types):
             country = country.upper()
         self.request_options = dict(
             country=country,
@@ -47,3 +49,6 @@ class ProxiesList(object):
         else:
             self.reload_provider()
         return next(self)
+
+    def next(self):
+        return self.__next__()
