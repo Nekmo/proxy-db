@@ -2,4 +2,4 @@ requests==2.20.0
 click==7.0
 sqlalchemy==1.2.12
 beautifulsoup4==4.6.3
-geoip2
+geoip2==2.9.0
