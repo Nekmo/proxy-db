@@ -1,5 +1,5 @@
 requests==2.20.0
 click==7.0
-sqlalchemy
+sqlalchemy==1.2.12
 beautifulsoup4
 geoip2
