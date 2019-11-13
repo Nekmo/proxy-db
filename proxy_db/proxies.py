@@ -34,21 +34,26 @@ class ProxiesList(object):
 
     def reload_provider(self):
         provider = self.find_provider()
-        # TODO: controlar cuando no hay provider
         provider.request(**self.request_options).now()
 
     def __iter__(self):
         self._proxies = set()
         return self
 
-    def __next__(self):
+    def try_get_proxy(self, retry=True):
         proxy = self.find_db_proxy()
         if proxy:
             self._proxies.add(proxy)
             return proxy
         else:
             self.reload_provider()
-        return next(self)
+        if retry:
+            return self.try_get_proxy(retry=False)
+        else:
+            raise StopIteration
+
+    def __next__(self):
+        return self.try_get_proxy()
 
     def next(self):
         return self.__next__()
