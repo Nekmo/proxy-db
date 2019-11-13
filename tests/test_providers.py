@@ -125,3 +125,20 @@ class TestProxyNovaCom(unittest.TestCase):
             {'proxy': '190.95.300.123:8080'},
             {'proxy': '190.900.48.190:7070'},
         ])
+
+
+class TestNoProviderInfiniteLoop(unittest.TestCase):
+    """Test to make sure that it doesn't fall into an infinite loop when
+    next(ProxiesList(country)) is called with a country with no proxies."""
+
+    @patch("proxy_db.proxies.ProxiesList.reload_provider")
+    @patch("proxy_db.proxies.ProxiesList.find_db_proxy")
+    def test_infinite_recursion_loop_solution(self, reload_provider_mock, find_db_proxy_mock):
+        """This call was falling into a recursion loop. Now tries only twice and then gets out."""
+        from proxy_db.proxies import ProxiesList
+        reload_provider_mock.return_value = None
+        find_db_proxy_mock.return_value = None
+
+        self.assertIsNone(next(ProxiesList("country")))
+        self.assertEqual(find_db_proxy_mock.call_count, 2)
+        self.assertEqual(reload_provider_mock.call_count, 2)
