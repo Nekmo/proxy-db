@@ -50,7 +50,7 @@ class ProxiesList(object):
         if retry:
             return self.try_get_proxy(retry=False)
         else:
-            return
+            raise StopIteration
 
     def __next__(self):
         return self.try_get_proxy()
