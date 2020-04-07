@@ -136,12 +136,20 @@ class ProxyNovaCom(SoupProvider):
 
     def soup_item(self, item):
         # document.write('12345678190.7'.substr(8) + '7.81.128');
-        script = item.find('script').string
-        port = ''.join(item.find_all('td')[1].stripped_strings)
+        script = item.find('script')
+        if script is None:
+            self.logger.warning('Script tag is no available in item {}'.format(item))
+            return None
+        script = script.string or ''
+        td_tags = item.find_all('td')
+        if len(td_tags) < 2:
+            self.logger.warning('td tag including port is not available in item {}'.format(item))
+            return None
+        port = ''.join(td_tags[1].stripped_strings or '')
         subs = script.split("'")
         matchs = re.match('.+substr\((\d+)\).+', script)
         if matchs is None:
-            self.logger.warning('Invalid item: {}'.format(item))
+            self.logger.warning('Invalid script value for item {}'.format(item))
             return None
         substr = int(matchs.group(1))
         start = subs[1][substr:]

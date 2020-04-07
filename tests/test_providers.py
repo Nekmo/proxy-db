@@ -14,7 +14,7 @@ from proxy_db.providers import ProxyNovaCom, Provider, ProviderRequestBase, PROV
 URL = 'https://domain.com/'
 PROVIDER_HTML = """
 Proxy: 12.131.91.51:8888
-<b>Other: 8.10.81.82:7171.</b> 
+<b>Other: 8.10.81.82:7171.</b>
 """
 PROXY_NOVA_HTML = """
     <tr data-proxy-id="00000000">
@@ -28,6 +28,30 @@ PROXY_NOVA_HTML = """
     <tr data-proxy-id="00000000">
         <td align="left" onclick="javascript:check_proxy(this)">
             <abbr title="static.190.900.48.190.gtdinternet.com"><script>document.write('12345678190.9'.substr(8) + '00.48.190');</script> </abbr>
+        </td>
+        <td align="left">
+            <a href="/proxy-server-list/port-7070/" title="Port 7070 proxies">7070</a>
+        </td>
+    </tr>
+"""
+PROXY_NOVA_INVALID_ROWS_HTML = """
+    <tr data-proxy-id="00000000">
+        Script tag is not available
+        <td align="left" onclick="javascript:check_proxy(this)"></td>
+        <td align="left">
+            <a href="/proxy-server-list/port-7070/" title="Port 7070 proxies">7070</a>
+        </td>
+    </tr>
+    <tr data-proxy-id="00000000">
+        Second td is not available
+        <td align="left" onclick="javascript:check_proxy(this)">
+            <abbr title=""><script>document.write('12345678190.9'.substr(8) + '5.300.123');<</script> </abbr>
+        </td>
+    </tr>
+    <tr data-proxy-id="00000000">
+        Invalid script value
+        <td align="left" onclick="javascript:check_proxy(this)">
+            <abbr title=""><script>'foo' 'bar' 'spam'</script> </abbr>
         </td>
         <td align="left">
             <a href="/proxy-server-list/port-7070/" title="Port 7070 proxies">7070</a>
@@ -125,6 +149,19 @@ class TestProxyNovaCom(unittest.TestCase):
             {'proxy': '190.95.300.123:8080'},
             {'proxy': '190.900.48.190:7070'},
         ])
+
+    @patch("proxy_db.providers.getLogger")
+    def test_invalid_rows(self, m):
+        provider = ProxyNovaCom()
+        request = Mock()
+        request.text = PROXY_NOVA_INVALID_ROWS_HTML
+        self.assertEqual(provider.find_page_proxies(request), [])
+        self.assertEqual(
+            m.return_value.warning.call_count, 3,
+            "Expected 'warning' to have been called 3 times. Called {}".format(
+                m.return_value.warning.call_count
+            )
+        )
 
 
 class TestNoProviderInfiniteLoop(unittest.TestCase):
