@@ -7,6 +7,8 @@ from __future__ import absolute_import
 import copy
 import datetime
 import re
+from logging import getLogger
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -74,6 +76,7 @@ class Provider(object):
 
     def __init__(self, base_url=None):
         self.base_url = base_url or self.base_url
+        self.logger = getLogger('proxy_db.providers.{}'.format(self.lowercase_name()))
 
     def request(self, url=None, country=None):
         url = url or self.base_url
@@ -99,6 +102,9 @@ class Provider(object):
     def get_provider_request(self, url, country):
         return ProviderRequestBase(self, url, options={'country': country})
 
+    def lowercase_name(self):
+        return self.name.lower().replace(' ', '_')
+
 
 class SoupProvider(Provider):
     parser = 'lxml' if lxml_available else 'html.parser'
@@ -106,7 +112,7 @@ class SoupProvider(Provider):
     def find_page_proxies(self, request):
         soup = BeautifulSoup(request.text, self.parser)
         items = self.soup_items(soup)
-        return [self.soup_item(item) for item in items]
+        return list(filter(bool, map(lambda item: self.soup_item(item), items)))
 
     def soup_items(self, soup):
         raise NotImplementedError
@@ -133,7 +139,11 @@ class ProxyNovaCom(SoupProvider):
         script = item.find('script').string
         port = ''.join(item.find_all('td')[1].stripped_strings)
         subs = script.split("'")
-        substr = int(re.match('.+substr\((\d+)\).+', script).group(1))
+        matchs = re.match('.+substr\((\d+)\).+', script)
+        if matchs is None:
+            self.logger.warning('Invalid item: {}'.format(item))
+            return None
+        substr = int(matchs.group(1))
         start = subs[1][substr:]
         end = subs[-2]
         return {'proxy': '{}{}:{}'.format(start, end, port)}
