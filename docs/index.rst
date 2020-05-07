@@ -20,5 +20,5 @@ Contents
    :glob:
 
    readme
-   templates
-   modules
+   installation
+   usage

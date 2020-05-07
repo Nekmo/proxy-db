@@ -132,8 +132,16 @@ html_theme = os.environ.get('HTML_THEME', 'alabaster')
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    # 'logo': 'logo.png',
-    # 'description': 'proxy-db',
+    'logo': 'logo.png',
+    'description': 'Manage free and private proxies on local db for Python Projects',
+    'github_user': 'Nekmo',
+    'github_repo': 'proxy-db',
+    'github_type': 'star',
+    'github_banner': True,
+    'travis_button': True,
+    'codecov_button': True,
+    'analytics_id': 'UA-62276079-1',
+    'canonical_url': 'http://docs.nekmo.org/proxy-db/'
 }
 
 
