@@ -80,6 +80,9 @@ class Proxy(Base):
     def copy(self):
         return {key: self.id for key in PROTOCOLS}
 
+    def __repr__(self):
+        return "<Proxy {}>".format(self.id)
+
     def __str__(self):
         return self.id
 
