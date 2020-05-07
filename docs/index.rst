@@ -9,7 +9,7 @@ To **install** proxy-db, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install -U django-code-generator
+    $ pip install -U proxy-db
 
 
 Contents
