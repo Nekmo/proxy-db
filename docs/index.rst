@@ -1,22 +1,11 @@
-Welcome to proxy-db's documentation!
-======================================
-
-Contents:
+proxy-db documentation
+=============================================
 
 .. toctree::
    :maxdepth: 2
+   :glob:
 
    readme
-   installation
-   usage
-   modules
-   contributing
-   authors
-   history
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+..
+   _ modules
