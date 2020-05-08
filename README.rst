@@ -65,6 +65,8 @@ Free proxies providers included:
 
 * ProxyNova
 
+For more information see `the docs <https://docs.nekmo.org/proxy-db/>`_.
+
 
 Install
 =======
@@ -73,6 +75,7 @@ If you have Pip installed on your system, you can use it to install the latest P
     $ sudo pip3 install proxy-db
 
 Python 2.7 & 3.4-3.7 are supported but Python 3.x is recommended. Use ``pip2`` on install for Python2.
+`More info in the documentation <https://docs.nekmo.org/proxy-db/installation.html>`_
 
 
 * Free software: Apache Software License 2.0
