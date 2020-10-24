@@ -21,7 +21,7 @@ class ProviderRequest(Base):
 
     id = Column(Integer, Sequence('provider_requests_id_seq'), primary_key=True)
     provider = Column(String(30))
-    request_id = Column(String(255), index=True, unique=True)
+    request_id = Column(String(255), index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     results = Column(Integer)
@@ -35,6 +35,7 @@ class Proxy(Base):
     id = Column(String(255), primary_key=True)
     votes = Column(Integer, default=0)
     country = Column(String(5))
+    protocol = Column(String(32))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     on_provider_at = Column(DateTime(timezone=True))
@@ -85,6 +86,21 @@ class Proxy(Base):
 
     def __str__(self):
         return self.id
+
+
+class Version(Base):
+    __tablename__ = 'versions'
+    _proxies_list = None
+
+    id = Column(Integer, Sequence('version_id_seq'), primary_key=True)
+    version = Column(String(64))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    def __repr__(self):
+        return "<Version {}>".format(self.version)
+
+    def __str__(self):
+        return self.version
 
 
 proxy_db_dir = os.path.dirname(PROXY_DB_FILE)
