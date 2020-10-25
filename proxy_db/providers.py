@@ -43,10 +43,15 @@ class ProviderRequestBase(object):
         self.data = data
         self.options = options
 
+    def make_request(self):
+        return requests.request(self.method, self.url)
+
     def now(self):
-        proxies = self.provider.process_page(requests.request(self.method, self.url), self)
         session = create_session()
-        self.get_or_create(session, {'results': len(proxies)})
+        proxies = self.provider.process_page(self.make_request(), session)
+        provider_request, _ = self.get_or_create(session, {'results': len(proxies)})
+        for proxy in proxies:
+            provider_request.proxies.append(proxy)
         session.commit()
 
     def requires_update(self):
@@ -85,19 +90,24 @@ class Provider(object):
     def find_page_proxies(self, request):
         return [{'proxy': proxy} for proxy in IP_PORT_PATTERN_GLOBAL.findall(request.text)]
 
-    def process_page(self, request, provider_request):
-        return self.process_proxies(self.find_page_proxies(request))
+    def process_page(self, request, session=None):
+        return self.process_proxies(self.find_page_proxies(request), session)
 
-    def process_proxies(self, proxies):
-        session = create_session()
+    def process_proxies(self, proxies, session=None):
+        session = session or create_session()
+        proxy_instances = []
         for proxy in proxies:
-            instance, exists = get_or_create(session, Proxy, defaults=dict(votes=0),
-                                             id='http://{}'.format(proxy['proxy']))
+            protocol = proxy.get('protocol', 'http')
+            instance, exists = get_or_create(
+                session, Proxy, defaults=dict(votes=0, protocol=protocol),
+                id='{}://{}'.format(protocol, proxy['proxy'])
+            )
             if not instance.country:
                 instance.country = ip_country(get_domain(instance.id))
             instance.votes += UPDATE_VOTES
+            proxy_instances.append(instance)
         session.commit()
-        return proxies
+        return proxy_instances
 
     def get_provider_request(self, url, country):
         return ProviderRequestBase(self, url, options={'country': country})
@@ -157,6 +167,41 @@ class ProxyNovaCom(SoupProvider):
         return {'proxy': '{}{}:{}'.format(start, end, port)}
 
 
+# class NordVpnProviderRequest(ProviderRequestBase):
+#     def make_request(self):
+#         return requests.request(self.method, self.url, )
+
+
+class NordVpn(Provider):
+    name = 'Nord VPN'
+    base_url = 'https://api.nordvpn.com/server'
+    protocols = [
+        {'feature': 'socks', 'protocol': 'socks5', 'port': 1080},
+        {'feature': 'proxy', 'protocol': 'http', 'port': 80},
+        {'feature': 'proxy_ssl', 'protocol': 'https', 'port': 443},
+    ]
+
+    def request(self, url=None, country=None):
+        url = url or self.base_url
+        return super(NordVpn, self).request(url, country)
+
+    def find_page_proxies(self, request):
+        proxies = request.json()
+        proxy_datas = []
+        for proxy in proxies:
+            for protocol in self.protocols:
+                if not proxy['features'].get(protocol['feature']):
+                    continue
+                proxy_datas.append({
+                    'proxy': '{ip_address}:{port}'.format(
+                        ip_address=proxy['ip_address'], **protocol
+                    ),
+                    'protocol': protocol['protocol'],
+                })
+        return proxy_datas
+
+
 PROVIDERS = [
+    NordVpn(),
     ProxyNovaCom(),
 ]
