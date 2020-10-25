@@ -1,5 +1,6 @@
 import os
-from sqlalchemy import create_engine, Integer, Column, String, Sequence, DateTime, func, Table, ForeignKey
+from sqlalchemy import create_engine, Integer, Column, String, Sequence, DateTime, func, Table, ForeignKey, \
+    UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -18,6 +19,8 @@ association_table = Table('proxy_provider_request', Base.metadata,
 
 class ProviderRequest(Base):
     __tablename__ = 'provider_requests'
+    __table_args__ = (UniqueConstraint('provider', 'request_id', name='_provider_request_uc'),
+                     )
 
     id = Column(Integer, Sequence('provider_requests_id_seq'), primary_key=True)
     provider = Column(String(30))
@@ -34,8 +37,8 @@ class Proxy(Base):
 
     id = Column(String(255), primary_key=True)
     votes = Column(Integer, default=0)
-    country = Column(String(5))
-    protocol = Column(String(32))
+    country = Column(String(5), index=True)
+    protocol = Column(String(32), index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     on_provider_at = Column(DateTime(timezone=True))
@@ -120,3 +123,7 @@ session_maker = create_session_maker()
 
 def create_session():
     return session_maker()
+
+
+from proxy_db.migrations import MigrateVersion
+MigrateVersion().migrate_pending_versions()
