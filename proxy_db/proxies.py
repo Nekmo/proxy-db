@@ -1,7 +1,7 @@
 import six
 
 from proxy_db.exceptions import NoProvidersAvailable
-from proxy_db.models import Proxy, create_session
+from proxy_db.models import Proxy, ProviderRequest, create_session
 from proxy_db.providers import PROVIDERS
 
 
@@ -14,19 +14,28 @@ class ProxiesList(object):
         )
         self._proxies = set()
 
+    def available_providers(self):
+        return filter(lambda x: x.is_available(), PROVIDERS)
+
     def _excluded_proxies(self):
         return [proxy.id for proxy in self._proxies]
 
     def find_db_proxy(self):
         query = create_session().query(Proxy).filter(Proxy.votes > 0)
-        query = query.filter(~Proxy.id.in_(self._excluded_proxies())).order_by(Proxy.votes.desc())
+        query = query.join(Proxy.provider_requests).filter(
+            ~Proxy.id.in_(self._excluded_proxies()),
+            ProviderRequest.provider.in_([x.name for x in self.available_providers()]),
+            # Proxy.provider_requests.provider.in_(self.available_providers())
+        ).order_by(Proxy.votes.desc())
         country = self.request_options['country']
         if country:
             query = query.filter_by(country=country)
-        return query.first()
+        proxy = query.first()
+        proxy._set_providers()
+        return proxy
 
     def find_provider(self):
-        for provider in PROVIDERS:
+        for provider in self.available_providers():
             req = provider.request(**self.request_options)
             if req.requires_update():
                 return provider

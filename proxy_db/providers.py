@@ -6,6 +6,7 @@ https://github.com/constverum/ProxyBroker/blob/master/proxybroker/providers.py
 from __future__ import absolute_import
 import copy
 import datetime
+import os
 import re
 from logging import getLogger
 
@@ -75,6 +76,22 @@ class ProviderRequestBase(object):
         return '-'.join(['{}'.format(x[1]) for x in sorted(self.options.items())])
 
 
+class ProviderCredentialMixin:
+    env_key_username =  None
+    env_key_password = None
+
+    def is_available(self):
+        return os.environ.get(self.env_key_username) and os.environ.get(self.env_key_password)
+
+    def has_credentials(self):
+        return self.is_available()
+
+    def credentials(self):
+        if not self.is_available():
+            return ()
+        return os.environ.get(self.env_key_username), os.environ.get(self.env_key_password)
+
+
 class Provider(object):
     name = 'Provider'
     base_url = None
@@ -82,6 +99,15 @@ class Provider(object):
     def __init__(self, base_url=None):
         self.base_url = base_url or self.base_url
         self.logger = getLogger('proxy_db.providers.{}'.format(self.lowercase_name()))
+
+    def is_available(self):
+        return True
+
+    def has_credentials(self):
+        return False
+
+    def credentials(self):
+        return ()
 
     def request(self, url=None, country=None):
         url = url or self.base_url
@@ -172,7 +198,7 @@ class ProxyNovaCom(SoupProvider):
 #         return requests.request(self.method, self.url, )
 
 
-class NordVpn(Provider):
+class NordVpn(ProviderCredentialMixin, Provider):
     name = 'Nord VPN'
     base_url = 'https://api.nordvpn.com/server'
     protocols = [
@@ -180,6 +206,8 @@ class NordVpn(Provider):
         {'feature': 'proxy', 'protocol': 'http', 'port': 80},
         {'feature': 'proxy_ssl', 'protocol': 'https', 'port': 443},
     ]
+    env_key_username =  'PROXYDB_NORDVPN_USERNAME'
+    env_key_password = 'PROXYDB_NORDVPN_PASSWORD'
 
     def request(self, url=None, country=None):
         url = url or self.base_url

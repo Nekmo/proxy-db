@@ -3,6 +3,7 @@ from sqlalchemy import create_engine, Integer, Column, String, Sequence, DateTim
     UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+from proxy_db._compat import urlparse
 
 PROXY_DB_FILE = os.environ.get('PROXY_DB_FILE', os.path.expanduser('~/.local/var/lib/proxy-db/db.sqlite3'))
 PROXY_DB_DB_URL = os.environ.get('PROXY_DB_DB_URL', 'sqlite:///{}'.format(PROXY_DB_FILE))
@@ -30,6 +31,10 @@ class ProviderRequest(Base):
     results = Column(Integer)
     proxies = relationship("Proxy", secondary=association_table, backref="provider_requests")
 
+    def get_provider_instance(self):
+        from proxy_db.providers import PROVIDERS
+        return next(filter(lambda x: x.name == self.provider, PROVIDERS))
+
 
 class Proxy(Base):
     __tablename__ = 'proxies'
@@ -42,6 +47,8 @@ class Proxy(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     on_provider_at = Column(DateTime(timezone=True))
+    providers = {}
+    credentials = ()
 
     def get_updated_proxy(self, session=None):
         """
@@ -79,16 +86,32 @@ class Proxy(Base):
     def __getitem__(self, item):
         if item not in PROTOCOLS:
             raise KeyError
-        return self.id
+        return str(self)
 
     def copy(self):
-        return {key: self.id for key in PROTOCOLS}
+        return {key: str(self) for key in PROTOCOLS}
+
+    def _set_providers(self):
+        provider_instances = map(lambda x: x.get_provider_instance(), self.provider_requests)
+        credential_provider = next(filter(lambda x: x.has_credentials(), provider_instances), None)
+        if credential_provider:
+            self.credentials = credential_provider.credentials()
+        self.providers = {proxy.provider for proxy in self.provider_requests}
 
     def __repr__(self):
-        return "<Proxy {}>".format(self.id)
+        return "<Proxy {} ({})>".format(self, ','.join(self.providers))
+
+    def proxy_with_credentials(self):
+        if self.credentials:
+            url_result = urlparse(self.id)
+            return '{url_result.scheme}://{username}:{password}@{url_result.netloc}'.format(
+                username=self.credentials[0], password=self.credentials[0],
+                url_result=url_result
+            )
+        return self.id
 
     def __str__(self):
-        return self.id
+        return self.proxy_with_credentials()
 
 
 class Version(Base):
