@@ -136,8 +136,11 @@ setup(
     platforms=PLATFORMS,
 
     install_requires=read_requirement_file(REQUIREMENT_FILE),
+    extras_require={
+        'geoip': ["geoip2", 'geoip2-tools'],
+    },
 
-    # entry_points={},
+# entry_points={},
 
     zip_safe=False,
 )
