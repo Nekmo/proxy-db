@@ -31,7 +31,8 @@ class ProxiesList(object):
         if country:
             query = query.filter_by(country=country)
         proxy = query.first()
-        proxy._set_providers()
+        if proxy is not None:
+            proxy._set_providers()
         return proxy
 
     def find_provider(self):
