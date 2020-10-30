@@ -85,7 +85,7 @@ class TestProviderRequestBase(unittest.TestCase):
     url = URL
 
     @patch('proxy_db.providers.create_session')
-    @patch('proxy_db.providers.ProviderRequestBase.get_or_create')
+    @patch('proxy_db.providers.ProviderRequestBase.get_or_create', return_value=(Mock(), None))
     def test_now(self, m2, m1):
         session_mock = requests_mock.Mocker()
         session_mock.start()
