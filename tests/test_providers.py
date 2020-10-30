@@ -79,7 +79,35 @@ PROXY_NOVA_INVALID_ROWS_HTML = """
     </td>
 </tr>
 """
-
+PROXY_NOVA_INVALID_COUNTRY = """
+<tr data-proxy-id="00000000">
+    <td align="left">
+        <abbr title="proxy.site.name">
+            <script>document.write('91.217.28.125');</script>
+        </abbr>
+    </td>
+    <td align="left">
+        3128
+    </td>
+    <td align="left">
+        <img src="/assets/images/blank.gif" class="flag flag-ua inline-block align-middle" />
+        Country is not available
+    </td>
+</tr>
+<tr data-proxy-id="00000000">
+    <td align="left">
+        <abbr title="proxy.site.name">
+            <script>document.write('89.145.199.64');</script>
+        </abbr>
+    </td>
+    <td align="left">
+        8080
+    </td>
+    <td align="left">
+        <img src="/assets/images/blank.gif" class="flag flag-hu inline-block align-middle" alt="INVALID">
+    </td>
+</tr>
+"""
 
 class TestProviderRequestBase(unittest.TestCase):
     url = URL
@@ -167,8 +195,18 @@ class TestProxyNovaCom(unittest.TestCase):
         request = Mock()
         request.text = PROXY_NOVA_HTML
         self.assertEqual(provider.find_page_proxies(request), [
-            {'proxy': '91.217.28.125:3128'},
-            {'proxy': '89.145.199.64:8080'},
+            {'proxy': '91.217.28.125:3128', 'country_code': 'UA'},
+            {'proxy': '89.145.199.64:8080', 'country_code': 'HU'},
+        ])
+
+    @patch("proxy_db.providers.getLogger")
+    def test_invalid_country(self, m):
+        provider = ProxyNovaCom()
+        request = Mock()
+        request.text = PROXY_NOVA_INVALID_COUNTRY
+        self.assertEqual(provider.find_page_proxies(request), [
+            {'proxy': '91.217.28.125:3128', 'country_code': None},
+            {'proxy': '89.145.199.64:8080', 'country_code': None},
         ])
 
     @patch("proxy_db.providers.getLogger")

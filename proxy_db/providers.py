@@ -13,7 +13,7 @@ from logging import getLogger
 import requests
 from bs4 import BeautifulSoup
 
-from proxy_db.countries import ip_country
+from proxy_db.countries import ip_country, COUNTRIES
 from proxy_db.db import get_or_create
 from proxy_db.models import create_session, Proxy, ProviderRequest
 from proxy_db.utils import get_domain
@@ -172,7 +172,6 @@ class ProxyNovaCom(SoupProvider):
         return soup.select('tr[data-proxy-id]')
 
     def soup_item(self, item):
-        # document.write('12345678190.7'.substr(8) + '7.81.128');
         script = item.find('script')
         if script is None:
             self.logger.warning('Script tag is no available in item {}'.format(item))
@@ -187,8 +186,17 @@ class ProxyNovaCom(SoupProvider):
         if matchs is None:
             self.logger.warning('Invalid script value for item {}'.format(item))
             return None
+        img = item.find('img', class_='flag')
+        country = None
+        if img is None or 'alt' not in img.attrs:
+            self.logger.warning('Image with country is not available in item {}'.format(item))
+        else:
+            country = img.attrs['alt'].upper()
+        if country and country not in COUNTRIES:
+            self.logger.warning('Invalid country code in item {}: {}'.format(item, country))
+            country = None
         ip_address = matchs.group(1)
-        return {'proxy': '{}:{}'.format(ip_address, port)}
+        return {'proxy': '{}:{}'.format(ip_address, port), 'country_code': country}
 
 
 # class NordVpnProviderRequest(ProviderRequestBase):
