@@ -130,7 +130,8 @@ class Provider(object):
                 id='{}://{}'.format(protocol, proxy['proxy'])
             )
             if not instance.country:
-                instance.country = ip_country(get_domain(instance.id))
+                detected_country = ip_country(get_domain(instance.id))
+                instance.country = detected_country or proxy.get('country_code') or ''
             instance.votes += UPDATE_VOTES
             proxy_instances.append(instance)
         session.commit()

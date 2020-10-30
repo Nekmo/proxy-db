@@ -272,6 +272,8 @@ geoip2_manager = Geoip2DataBaseManager(os.environ.get(MAXMIND_LICENSE_KEY_ENVNAM
 
 
 def ip_country(ip):
+    if not geoip2_manager.is_license_key_available():
+        return ''
     try:
         country = geoip2_manager['country'].reader.country(ip)
     except AddressNotFoundError:
