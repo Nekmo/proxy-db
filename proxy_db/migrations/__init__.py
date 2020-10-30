@@ -1,4 +1,3 @@
-from proxy_db.models import create_session, Version
 from proxy_db.utils import import_string
 
 
@@ -8,11 +7,13 @@ class MigrateVersion(object):
     ]
 
     def is_last_version(self):
+        from proxy_db.models import create_session, Version
         session = create_session()
         version = session.query(Version).order_by(Version.id.desc()).first()
         return version.version == self.versions[-1] if version else False
 
     def pending_versions(self):
+        from proxy_db.models import create_session, Version
         session = create_session()
         migrated_versions = session.query(Version).order_by(Version.id.asc()).all()
         migrated_versions = set([version.version for version in migrated_versions])
