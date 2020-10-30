@@ -224,6 +224,12 @@ class NordVpn(ProviderCredentialMixin, Provider):
         proxies = request.json()
         proxy_datas = []
         for proxy in proxies:
+            country = proxy['flag']
+            if country not in COUNTRIES:
+                self.logger.warning('Invalid country in proxy {}: {}'.format(
+                    proxy['ip_address'], country,
+                ))
+                country = None
             for protocol in self.protocols:
                 if not proxy['features'].get(protocol['feature']):
                     continue
@@ -231,6 +237,7 @@ class NordVpn(ProviderCredentialMixin, Provider):
                     'proxy': '{ip_address}:{port}'.format(
                         ip_address=proxy['ip_address'], **protocol
                     ),
+                    'country_code': country,
                     'protocol': protocol['protocol'],
                 })
         return proxy_datas
