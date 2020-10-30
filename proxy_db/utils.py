@@ -1,8 +1,7 @@
 from __future__ import absolute_import
-
 from importlib import import_module
+from six import raise_from
 
-import requests
 from proxy_db._compat import urlparse
 
 
@@ -19,13 +18,18 @@ def import_string(dotted_path):
     try:
         module_path, class_name = dotted_path.rsplit('.', 1)
     except ValueError as err:
-        raise ImportError("%s doesn't look like a module path" % dotted_path) from err
+        # raise ImportError("%s doesn't look like a module path" % dotted_path) from err
+        raise_from(ImportError("%s doesn't look like a module path" % dotted_path), err)
+
 
     module = import_module(module_path)
 
     try:
         return getattr(module, class_name)
     except AttributeError as err:
-        raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
+        # raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
+        #     module_path, class_name)
+        # ) from err
+        raise_from(ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
-        ) from err
+        ), err)

@@ -2,8 +2,11 @@ from __future__ import absolute_import
 
 import os
 
-from geoip2.errors import AddressNotFoundError
-from geoip2_tools.manager import Geoip2DataBaseManager
+try:
+    from geoip2.errors import AddressNotFoundError
+    from geoip2_tools.manager import Geoip2DataBaseManager
+except ImportError:
+    Geoip2DataBaseManager = AddressNotFoundError = None
 
 
 MAXMIND_LICENSE_KEY_ENVNAME = 'MAXMIND_LICENSE_KEY'
@@ -268,11 +271,14 @@ COUNTRIES = {
 }
 
 
-geoip2_manager = Geoip2DataBaseManager(os.environ.get(MAXMIND_LICENSE_KEY_ENVNAME))
+if Geoip2DataBaseManager is not None:
+    geoip2_manager = Geoip2DataBaseManager(os.environ.get(MAXMIND_LICENSE_KEY_ENVNAME))
+else:
+    geoip2_manager = None
 
 
 def ip_country(ip):
-    if not geoip2_manager.is_license_key_available():
+    if geoip2_manager is None or not geoip2_manager.is_license_key_available():
         return ''
     try:
         country = geoip2_manager['country'].reader.country(ip)

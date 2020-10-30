@@ -2,4 +2,4 @@ requests
 click
 sqlalchemy
 beautifulsoup4
-geoip2-tools
+
