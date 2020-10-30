@@ -26,6 +26,7 @@ else:
     lxml_available = True
 
 PROVIDER_REQUIRES_UPDATE_MINUTES = 45
+SIMPLE_IP_PATTERN = re.compile('(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
 IP_PORT_PATTERN_GLOBAL = re.compile(
     r'(?P<ip>(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))'  # noqa
     r'(?=.*?(?:(?:(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?P<port>\d{2,5})))',  # noqa
@@ -182,15 +183,12 @@ class ProxyNovaCom(SoupProvider):
             self.logger.warning('td tag including port is not available in item {}'.format(item))
             return None
         port = ''.join(td_tags[1].stripped_strings or '')
-        subs = script.split("'")
-        matchs = re.match('.+substr\((\d+)\).+', script)
+        matchs = SIMPLE_IP_PATTERN.search(script)
         if matchs is None:
             self.logger.warning('Invalid script value for item {}'.format(item))
             return None
-        substr = int(matchs.group(1))
-        start = subs[1][substr:]
-        end = subs[-2]
-        return {'proxy': '{}{}:{}'.format(start, end, port)}
+        ip_address = matchs.group(1)
+        return {'proxy': '{}:{}'.format(ip_address, port)}
 
 
 # class NordVpnProviderRequest(ProviderRequestBase):
