@@ -16,7 +16,7 @@ class Migrate(MigrateBase):
     ]
 
     def migrate_data(self):
-        super().migrate_data()
+        super(Migrate, self).migrate_data()
         new_database_session = self.create_new_database()
         for proxy in new_database_session.query(Proxy).all():
             proxy.protocol = proxy.id.split(':')[0]

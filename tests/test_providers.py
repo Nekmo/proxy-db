@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """Tests for `proxy-db` package."""
+import copy
 import datetime
 import unittest
 
@@ -9,7 +10,7 @@ import requests_mock
 
 from ._compat import Mock, patch
 
-from proxy_db.providers import ProxyNovaCom, Provider, ProviderRequestBase, PROVIDER_REQUIRES_UPDATE_MINUTES
+from proxy_db.providers import ProxyNovaCom, Provider, ProviderRequestBase, PROVIDER_REQUIRES_UPDATE_MINUTES, NordVpn
 
 URL = 'https://domain.com/'
 PROVIDER_HTML = """
@@ -108,6 +109,22 @@ PROXY_NOVA_INVALID_COUNTRY = """
     </td>
 </tr>
 """
+NORDVPN_SERVERS = [
+    {
+        "id":0, "ip_address":"123.123.123.123", "search_keywords":[], "load":55,
+        "categories":[{"name":"Standard VPN servers"}, {"name":"P2P"}], "name":"United States #0",
+        "domain":"us0.nordvpn.com", "price":0, "flag":"US", "country":"United States", "location": {"lat":0, "long":0},
+        "features": {
+            "ikev2": True, "openvpn_udp": True, "openvpn_tcp": True, "socks": True, "proxy": True, "pptp": False,
+            "l2tp": False, "openvpn_xor_udp": False, "openvpn_xor_tcp": False, "proxy_cybersec": False,
+            "proxy_ssl": True, "proxy_ssl_cybersec": True, "ikev2_v6": False, "openvpn_udp_v6": False,
+            "openvpn_tcp_v6": False, "wireguard_udp": False, "openvpn_udp_tls_crypt": False,
+            "openvpn_tcp_tls_crypt": False, "openvpn_dedicated_udp": False, "openvpn_dedicated_tcp": False,
+            "skylark": False
+        }
+    }
+]
+
 
 class TestProviderRequestBase(unittest.TestCase):
     url = URL
@@ -221,6 +238,37 @@ class TestProxyNovaCom(unittest.TestCase):
                 m.return_value.warning.call_count
             )
         )
+
+
+class TestNordVPN(unittest.TestCase):
+    url = NordVpn.base_url
+
+    @patch("proxy_db.providers.Provider.request")
+    def test_request(self, m):
+        provider = NordVpn()
+        provider.request(self.url)
+        m.assert_called_with(self.url, None)
+
+    def test_find_page_proxies(self):
+        provider = NordVpn()
+        request = Mock()
+        request.json.return_value = NORDVPN_SERVERS
+        self.assertEqual(provider.find_page_proxies(request), [
+            {'country_code': 'US', 'protocol': 'socks5', 'proxy': '123.123.123.123:1080'},
+            {'country_code': 'US', 'protocol': 'http', 'proxy': '123.123.123.123:80'},
+            {'country_code': 'US', 'protocol': 'https', 'proxy': '123.123.123.123:443'}
+        ])
+
+    def test_invalid_country(self):
+        provider = NordVpn()
+        request = Mock()
+        servers = copy.deepcopy(NORDVPN_SERVERS)
+        servers[0]['flag'] = 'FOO'
+        servers[0]['features'] = {'socks': True}
+        request.json.return_value = servers
+        self.assertEqual(provider.find_page_proxies(request), [
+            {'country_code': None, 'protocol': 'socks5', 'proxy': '123.123.123.123:1080'},
+        ])
 
 
 class TestNoProviderInfiniteLoop(unittest.TestCase):
