@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, Mock
+from ._compat import patch, Mock
 
 from proxy_db.proxies import ProxiesList
 
