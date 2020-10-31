@@ -23,7 +23,15 @@ class MigrateVersion(object):
         for version in self.pending_versions():
             self.migrate_version(version)
 
-    def migrate_version(self, version):
+    def create_all_versions(self):
+        for version in self.versions:
+            migration_cls = self.import_migration(version)
+            migration_cls().create_version_row()
+
+    def import_migration(self, version):
         version_alias = version.replace('.', '_')
-        migrate_cls = import_string('proxy_db.migrations.migration_{}.Migrate'.format(version_alias))
-        migrate_cls().migrate()
+        return import_string('proxy_db.migrations.migration_{}.Migrate'.format(version_alias))
+
+    def migrate_version(self, version):
+        migration_cls = self.import_migration(version)
+        migration_cls().migrate()

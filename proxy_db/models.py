@@ -133,6 +133,7 @@ proxy_db_dir = os.path.dirname(PROXY_DB_FILE)
 if not os.path.lexists(proxy_db_dir):
     os.makedirs(proxy_db_dir)
 
+db_created = not os.path.lexists(PROXY_DB_FILE)
 engine = create_engine(PROXY_DB_DB_URL,
                        connect_args={'check_same_thread': False} if PROXY_DB_DB_URL.startswith('sqlite://') else {})
 Base.metadata.create_all(engine)
@@ -140,6 +141,7 @@ Base.metadata.create_all(engine)
 
 def create_session_maker():
     return sessionmaker(bind=engine)
+
 
 session_maker = create_session_maker()
 
@@ -149,4 +151,9 @@ def create_session():
 
 
 from proxy_db.migrations import MigrateVersion
-MigrateVersion().migrate_pending_versions()
+
+
+if db_created:
+    MigrateVersion().create_all_versions()
+else:
+    MigrateVersion().migrate_pending_versions()
