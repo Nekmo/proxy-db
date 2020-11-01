@@ -14,7 +14,7 @@ class ProxiesList(object):
         )
         self._proxies = set()
         if provider is not None and isinstance(provider, str):
-            provider = next(filter(lambda x: x.name == provider, PROVIDERS), None)
+            provider = next(iter(filter(lambda x: x.name == provider, PROVIDERS)), None)
             assert provider is not None, "Invalid provider name."
         self.provider = provider
 

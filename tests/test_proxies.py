@@ -15,9 +15,9 @@ class TestProxiesList(unittest.TestCase):
             ProxiesList(provider='foo')
 
     def test_available_providers_filtered(self):
-        provider = next(filter(lambda x: x.name == ProxyNovaCom.name, PROVIDERS))
+        provider = next(iter(filter(lambda x: x.name == ProxyNovaCom.name, PROVIDERS)))
         proxies_list = ProxiesList(provider=provider)
-        self.assertEqual(next(proxies_list.available_providers()), provider)
+        self.assertEqual(next(iter(proxies_list.available_providers())), provider)
 
     @patch('proxy_db.proxies.create_session')
     def test_find_db_proxy(self, m):
