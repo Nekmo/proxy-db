@@ -1,10 +1,24 @@
 import unittest
+
+from proxy_db.providers import ProxyNovaCom, PROVIDERS
 from ._compat import patch, Mock
 
 from proxy_db.proxies import ProxiesList
 
 
 class TestProxiesList(unittest.TestCase):
+    def test_provider_name(self):
+        self.assertEqual(ProxiesList(provider=ProxyNovaCom.name).provider.name, ProxyNovaCom.name)
+
+    def test_invalid_provider_name(self):
+        with self.assertRaises(AssertionError):
+            ProxiesList(provider='foo')
+
+    def test_available_providers_filtered(self):
+        provider = next(filter(lambda x: x.name == ProxyNovaCom.name, PROVIDERS))
+        proxies_list = ProxiesList(provider=provider)
+        self.assertEqual(next(proxies_list.available_providers()), provider)
+
     @patch('proxy_db.proxies.create_session')
     def test_find_db_proxy(self, m):
         ProxiesList().find_db_proxy()
