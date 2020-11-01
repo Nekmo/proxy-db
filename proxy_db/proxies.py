@@ -6,16 +6,23 @@ from proxy_db.providers import PROVIDERS
 
 
 class ProxiesList(object):
-    def __init__(self, country=None):
+    def __init__(self, country=None, provider=None):
         if isinstance(country, six.string_types):
             country = country.upper()
         self.request_options = dict(
             country=country,
         )
         self._proxies = set()
+        if provider is not None and isinstance(provider, str):
+            provider = next(filter(lambda x: x.name == provider, PROVIDERS), None)
+            assert provider is not None, "Invalid provider name."
+        self.provider = provider
 
     def available_providers(self):
-        return filter(lambda x: x.is_available(), PROVIDERS)
+        providers = PROVIDERS
+        if self.provider:
+            providers = [self.provider]
+        return filter(lambda x: x.is_available(), providers)
 
     def _excluded_proxies(self):
         return [proxy.id for proxy in self._proxies]
