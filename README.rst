@@ -51,13 +51,23 @@ determines the real country of the proxy using geoip.
         proxy.positive()
 
 
-Proxy-db will return the best proxies first (more positive votes). You can also filter by country:
+Proxy-db will return the best proxies first (more positive votes). You can also **filter by country**:
 
 .. code-block:: python
 
     from proxy_db.proxies import ProxiesList
 
     spain_proxy = next(ProxiesList('es'))
+    # ...
+
+
+You can also **filter by provider**:
+
+.. code-block:: python
+
+    from proxy_db.proxies import ProxiesList
+
+    proxy_nova_proxy = next(ProxiesList(provider='Proxy Nova'))
     # ...
 
 
