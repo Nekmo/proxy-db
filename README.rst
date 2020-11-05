@@ -79,17 +79,17 @@ For more information see `the docs <https://docs.nekmo.org/proxy-db/>`_.
 
 Install
 =======
-If you have Pip installed on your system, you can use it to install the latest ProxyDB stable version::
+If you have **Pip installed on your system**, you can use it to install the latest ProxyDB stable version::
 
-    $ sudo pip3 install proxy-db
+    $ pip3 install proxy-db
 
 Python 2.7 & 3.4-3.7 are supported but Python 3.x is recommended. Use ``pip2`` on install for Python2.
 `More info in the documentation <https://docs.nekmo.org/proxy-db/installation.html>`_
 
-Some providers do not have the correct country for proxies. To determine the correct country proxy-db can use geoip.
+Some providers do not have the correct country for proxies. To determine the correct country proxy-db can use **geoip**.
 To use this install the optional dependencies::
 
-    $ sudo pip3 install proxy-db[geoip]
+    $ pip3 install proxy-db[geoip]
 
 You also need a maxmind Geolite2 license (it's free). To obtain the license, follow these steps:
 
@@ -103,4 +103,12 @@ Sets the environment variable ``MAXMIND_LICENSE_KEY``. To set it from Python::
     import os
     os.environ['MAXMIND_LICENSE_KEY'] = '28xjifHSTxVq93xZ'
 
-* Free software: Apache Software License 2.0
+HTTPS & SOCKS5 proxies
+----------------------
+To use **socks5 proxies** with requests you need to install socks support::
+
+    $ pip3 install proxy-db[socks]
+
+To use **HTTPS proxies** with requests/urllib3 you need to install the latests urllib3 version from sources::
+
+    $ pip install https://github.com/urllib3/urllib3/archive/master.zip
