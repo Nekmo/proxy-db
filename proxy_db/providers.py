@@ -211,7 +211,7 @@ class NordVpn(ProviderCredentialMixin, Provider):
     protocols = [
         {'feature': 'socks', 'protocol': 'socks5', 'port': 1080},
         {'feature': 'proxy', 'protocol': 'http', 'port': 80},
-        {'feature': 'proxy_ssl', 'protocol': 'https', 'port': 443},
+        {'feature': 'proxy_ssl', 'protocol': 'https', 'port': 89},
     ]
     env_key_username =  'PROXYDB_NORDVPN_USERNAME'
     env_key_password = 'PROXYDB_NORDVPN_PASSWORD'
@@ -233,9 +233,10 @@ class NordVpn(ProviderCredentialMixin, Provider):
             for protocol in self.protocols:
                 if not proxy['features'].get(protocol['feature']):
                     continue
+                address = proxy['domain'] if protocol['protocol'] == 'https' else proxy['ip_address']
                 proxy_datas.append({
-                    'proxy': '{ip_address}:{port}'.format(
-                        ip_address=proxy['ip_address'], **protocol
+                    'proxy': '{address}:{port}'.format(
+                        address=address, **protocol
                     ),
                     'country_code': country,
                     'protocol': protocol['protocol'],

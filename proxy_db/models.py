@@ -105,7 +105,7 @@ class Proxy(Base):
         if self.credentials:
             url_result = urlparse(self.id)
             return '{url_result.scheme}://{username}:{password}@{url_result.netloc}'.format(
-                username=self.credentials[0], password=self.credentials[0],
+                username=self.credentials[0], password=self.credentials[1],
                 url_result=url_result
             )
         return self.id
