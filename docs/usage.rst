@@ -92,3 +92,37 @@ database configuration, by default ``sqlite:///{PROXY_DB_FILE}``.
 
 proxy-db uses sqlalchemy. For more information about how to configure the url to the database,
 `check its documentation <https://docs.sqlalchemy.org/en/13/core/engines.html>`_.
+
+Payment providers
+=================
+Some providers require a payment and additional steps to use.
+
+Nord VPN
+--------
+
+1. Login in Nord VPN.
+2. Go to `Nord VPN service details <https://my.nordaccount.com/dashboard/nordvpn/>`_.
+3. In **advanced configuration** copy/create your **username** and **password** for *Service credentials
+   (manual setup)*. These credentials are different from the username and password to log into the
+   Nord VPN website.
+4. Set environment variables ``PROXYDB_NORDVPN_USERNAME`` and ``PROXYDB_NORDVPN_PASSWORD`` in your program.
+
+To set **environment variables in Python**:
+
+.. code-block:: python
+
+    import os
+
+    os.environ['PROXYDB_NORDVPN_USERNAME'] = '2dybg3pvxN4XYpLpF2iBE3wz'
+    os.environ['PROXYDB_NORDVPN_PASSWORD'] = 'hjFq8QkKsnKM42o4Yzta8y2K'
+
+To set **environment variables in Bash** (before run your program):
+
+
+.. code-block:: shell
+
+    $ export PROXYDB_NORDVPN_USERNAME=2dybg3pvxN4XYpLpF2iBE3wz
+    $ export PROXYDB_NORDVPN_PASSWORD=hjFq8QkKsnKM42o4Yzta8y2K
+
+    $ ./your-program.py
+

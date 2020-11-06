@@ -72,7 +72,8 @@ You can also **filter by provider**:
 
 Free proxies providers included:
 
-* ProxyNova
+* Proxy Nova
+* Nord VPN (requires ``PROXYDB_NORDVPN_USERNAME`` & ``PROXYDB_NORDVPN_PASSWORD`` env. variables).
 
 For more information see `the docs <https://docs.nekmo.org/proxy-db/>`_.
 
