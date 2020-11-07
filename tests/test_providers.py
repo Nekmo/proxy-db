@@ -256,7 +256,7 @@ class TestNordVPN(unittest.TestCase):
         self.assertEqual(provider.find_page_proxies(request), [
             {'country_code': 'US', 'protocol': 'socks5', 'proxy': '123.123.123.123:1080'},
             {'country_code': 'US', 'protocol': 'http', 'proxy': '123.123.123.123:80'},
-            {'country_code': 'US', 'protocol': 'https', 'proxy': '123.123.123.123:443'}
+            {'country_code': 'US', 'protocol': 'https', 'proxy': 'us0.nordvpn.com:89'}
         ])
 
     def test_invalid_country(self):
