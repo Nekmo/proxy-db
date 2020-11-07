@@ -123,7 +123,7 @@ setup(
     scripts=scripts,
     include_package_data=True,
 
-    description=__doc__,
+    description=__doc__.strip(),
     long_description=open(readme, 'r').read(),
     keywords=KEYWORDS,
     download_url=PACKAGE_DOWNLOAD_URL,
