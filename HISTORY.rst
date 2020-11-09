@@ -2,6 +2,13 @@
 History
 =======
 
+v0.3.1 (2020-11-10)
+-------------------
+
+* Issue #24: Infinite loop getting proxy if no proxies available
+* Issue #23: sqlalchemy.exc.InvalidRequestError: Entity ProviderRequest has no property 'country'
+
+
 v0.3.0 (2020-11-07)
 -------------------
 
