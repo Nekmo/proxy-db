@@ -53,6 +53,12 @@ class ProxiesList(object):
         provider = self.find_provider()
         provider.request(**self.request_options).now()
 
+    def reload_provider_without_error(self):
+        try:
+            self.reload_provider()
+        except NoProvidersAvailable:
+            pass
+
     def __iter__(self):
         self._proxies = set()
         return self
@@ -62,8 +68,8 @@ class ProxiesList(object):
         if proxy:
             self._proxies.add(proxy)
             return proxy
-        else:
-            self.reload_provider()
+        elif retry:
+            self.reload_provider_without_error()
         if retry:
             return self.try_get_proxy(retry=False)
         else:
