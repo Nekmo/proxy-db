@@ -277,7 +277,7 @@ class TestNoProviderInfiniteLoop(unittest.TestCase):
 
     @patch("proxy_db.proxies.ProxiesList.reload_provider")
     @patch("proxy_db.proxies.ProxiesList.find_db_proxy")
-    def test_infinite_recursion_loop_solution(self, reload_provider_mock, find_db_proxy_mock):
+    def test_infinite_recursion_loop_solution(self, find_db_proxy_mock, reload_provider_mock):
         """This call was falling into a recursion loop. Now tries only twice and then raise
         an StopIteration exception."""
         from proxy_db.proxies import ProxiesList
@@ -286,4 +286,4 @@ class TestNoProviderInfiniteLoop(unittest.TestCase):
 
         self.assertRaises(StopIteration, lambda: next(ProxiesList("country")))
         self.assertEqual(find_db_proxy_mock.call_count, 2)
-        self.assertEqual(reload_provider_mock.call_count, 2)
+        self.assertEqual(reload_provider_mock.call_count, 1)
