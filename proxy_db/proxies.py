@@ -36,7 +36,7 @@ class ProxiesList(object):
         ).order_by(Proxy.votes.desc())
         country = self.request_options['country']
         if country:
-            query = query.filter_by(country=country)
+            query = query.filter(Proxy.country == country)
         proxy = query.first()
         if proxy is not None:
             proxy._set_providers()
