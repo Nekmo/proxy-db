@@ -12,6 +12,7 @@ from logging import getLogger
 
 import requests
 from bs4 import BeautifulSoup
+from requests import RequestException
 
 from proxy_db.countries import ip_country, COUNTRIES
 from proxy_db.db import get_or_create
@@ -50,7 +51,12 @@ class ProviderRequestBase(object):
 
     def now(self):
         session = create_session()
-        proxies = self.provider.process_page(self.make_request(), session)
+        try:
+            response = self.make_request()
+        except RequestException:
+            self.provider.logger.exception('Error on request to {}'.format(self.url))
+            return
+        proxies = self.provider.process_page(response, session)
         provider_request, _ = self.get_or_create(session, {'results': len(proxies)})
         for proxy in proxies:
             provider_request.proxies.append(proxy)
