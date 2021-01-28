@@ -12,7 +12,7 @@ def cli():
 
 @cli.command()
 def add():
-    pass
+    """Add proxies from a file or from stdin."""
 
 
 if __name__ == '__main__':
