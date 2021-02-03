@@ -1,9 +1,30 @@
 # -*- coding: utf-8 -*-
+import string
+from itertools import filterfalse
 
 import click
 
 from proxy_db.providers import ManualProxy
 from proxy_db._compat import urlparse
+
+
+def proxy_is_valid(proxy):
+    return proxy.scheme and proxy.netloc
+
+
+def strip_chars(text, remove_chars=string.whitespace):
+    length = len(text)
+    start = 0
+    end = length
+    for i, char in enumerate(text):
+        if char not in remove_chars:
+            break
+        start = i + 1
+    for i, char in enumerate(reversed(text)):
+        if char not in remove_chars:
+            break
+        end = length - i - 1
+    return text[start:end]
 
 
 @click.group()
@@ -28,11 +49,16 @@ def add(file=None, votes=10, provider='default', proxies=None):
         proxies = click.get_text_stream('stdin')
     elif file:
         proxies = file.read()
-    proxies = [urlparse(proxy) for proxy in proxies]
-    proxies = [{'protocol': proxy.scheme, 'proxy': proxy.netloc} for proxy in proxies]
-    proxy_instances = ManualProxy(provider).add_proxies(proxies)
+    parsed_proxies = set([urlparse(strip_chars(proxy)) for proxy in proxies])
+    invalid_proxies = set(filterfalse(proxy_is_valid, parsed_proxies))
+    if invalid_proxies:
+        click.echo('Invalid proxies entered: {}'.format(
+            ', '.join(map(lambda x: x.geturl(), invalid_proxies))), err=True)
+    parsed_proxies -= invalid_proxies
+    proxies_data = [{'protocol': proxy.scheme, 'proxy': proxy.netloc} for proxy in parsed_proxies]
+    proxy_instances = ManualProxy(provider).add_proxies(proxies_data)
     created = filter(lambda x: x.updated_at is None, proxy_instances)
-    click.echo('Read {} proxies. {} new proxies have been created.'.format(len(proxies), len(list(created))))
+    click.echo('Read {} proxies. {} new proxies have been created.'.format(len(parsed_proxies), len(list(created))))
 
 
 if __name__ == '__main__':
