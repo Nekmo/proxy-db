@@ -44,7 +44,7 @@ class ProviderRequestBase(object):
         self.method = method
         self.headers = headers or copy.copy(self.headers)
         self.data = data
-        self.options = options
+        self.options = options or {}
 
     def make_request(self):
         return requests.request(self.method, self.url)
@@ -57,6 +57,10 @@ class ProviderRequestBase(object):
             self.provider.logger.exception('Error on request to {}'.format(self.url))
             return
         proxies = self.provider.process_page(response, session)
+        self.add_proxies(proxies, session)
+
+    def add_proxies(self, proxies, session=None):
+        session = session or create_session()
         provider_request, _ = self.get_or_create(session, {'results': len(proxies)})
         for proxy in proxies:
             provider_request.proxies.append(proxy)
@@ -248,6 +252,29 @@ class NordVpn(ProviderCredentialMixin, Provider):
                     'protocol': protocol['protocol'],
                 })
         return proxy_datas
+
+
+class ManualProxyRequest(ProviderRequestBase):
+    def __init__(self, provider):
+        super().__init__(provider, '')
+
+
+class ManualProxy(Provider):
+    def __init__(self, provider):
+        super().__init__()
+        self.name = provider
+
+    def is_available(self):
+        return False
+
+    def get_provider_request(self, url, country):
+        return ManualProxyRequest(self)
+
+    def add_proxies(self, proxies):
+        session = create_session()
+        proxy_instances = self.process_proxies(proxies, session)
+        self.get_provider_request(None, None).add_proxies(proxy_instances, session)
+        return proxy_instances
 
 
 PROVIDERS = [
