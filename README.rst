@@ -2,9 +2,9 @@
 
 |
 
-.. image:: https://img.shields.io/travis/Nekmo/proxy-db.svg?style=flat-square
-  :target: https://travis-ci.org/Nekmo/proxy-db
-  :alt: Latest Travis CI build status
+.. image:: https://img.shields.io/github/workflow/status/Nekmo/proxy-db/Tests.svg?style=flat-square&maxAge=2592000
+  :target: https://github.com/Nekmo/proxy-db/actions?query=workflow%3ATests
+  :alt: Latest Tests CI build status
 
 .. image:: https://img.shields.io/pypi/v/proxy-db.svg?style=flat-square
   :target: https://pypi.org/project/proxy-db/
