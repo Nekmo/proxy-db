@@ -1,9 +1,9 @@
 import unittest
-from unittest.mock import patch
 
 from click.testing import CliRunner
 
 from proxy_db.management import add
+from tests._compat import patch
 
 
 class TestAdd(unittest.TestCase):
