@@ -10,7 +10,8 @@ import requests_mock
 
 from ._compat import Mock, patch
 
-from proxy_db.providers import ProxyNovaCom, Provider, ProviderRequestBase, PROVIDER_REQUIRES_UPDATE_MINUTES, NordVpn
+from proxy_db.providers import ProxyNovaCom, Provider, ProviderRequestBase, PROVIDER_REQUIRES_UPDATE_MINUTES, NordVpn, \
+    ManualProxy
 
 URL = 'https://domain.com/'
 PROVIDER_HTML = """
@@ -287,3 +288,9 @@ class TestNoProviderInfiniteLoop(unittest.TestCase):
         self.assertRaises(StopIteration, lambda: next(ProxiesList("country")))
         self.assertEqual(find_db_proxy_mock.call_count, 2)
         self.assertEqual(reload_provider_mock.call_count, 1)
+
+
+class TestManualProvider(unittest.TestCase):
+    @patch('proxy_db.providers.create_session')
+    def test_add_proxies(self, m):
+        ManualProxy('manual').add_proxies([{'protocol': 'http', 'proxy': '1.2.3.4:999'}])
