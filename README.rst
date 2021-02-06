@@ -84,7 +84,7 @@ If you have **Pip installed on your system**, you can use it to install the late
 
     $ pip3 install proxy-db
 
-Python 2.7 & 3.4-3.7 are supported but Python 3.x is recommended. Use ``pip2`` on install for Python2.
+Python 2.7 & 3.4-3.9 are supported but Python 3.x is recommended. Use ``pip2`` on install for Python2.
 `More info in the documentation <https://docs.nekmo.org/proxy-db/installation.html>`_
 
 Some providers do not have the correct country for proxies. To determine the correct country proxy-db can use **geoip**.

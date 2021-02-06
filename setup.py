@@ -40,7 +40,7 @@ PLATFORMS = [
     # 'ios'
     # 'android'
 ]
-PYTHON_VERSIONS = ['2.7', '3.4-3.7']
+PYTHON_VERSIONS = ['2.7', '3.4-3.9']
 
 
 def read_requirement_file(path):
