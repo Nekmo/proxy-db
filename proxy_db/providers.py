@@ -256,12 +256,12 @@ class NordVpn(ProviderCredentialMixin, Provider):
 
 class ManualProxyRequest(ProviderRequestBase):
     def __init__(self, provider):
-        super().__init__(provider, '')
+        super(ManualProxyRequest, self).__init__(provider, '')
 
 
 class ManualProxy(Provider):
     def __init__(self, provider):
-        super().__init__()
+        super(ManualProxy, self).__init__()
         self.name = provider
 
     def is_available(self):
