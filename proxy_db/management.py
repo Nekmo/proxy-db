@@ -40,7 +40,7 @@ def cli():
 @click.option('--provider', default='manual', type=str,
               help='Provider name for proxies. It allows to know the origin of the proxies and search by provider.')
 @click.argument('proxies', type=str, required=False, nargs=-1)
-def add(file=None, votes=10, provider='default', proxies=None):
+def add(file=None, votes=10, provider='manual', proxies=None):
     """Add proxies in <protocol>://<address>:<port> format or <protocol>://<username>:<password>@<address>:<port>
     format.'"""
     if not file and not proxies:
@@ -56,7 +56,7 @@ def add(file=None, votes=10, provider='default', proxies=None):
             ', '.join(map(lambda x: x.geturl(), invalid_proxies))), err=True)
     parsed_proxies -= invalid_proxies
     proxies_data = [{'protocol': proxy.scheme, 'proxy': proxy.netloc} for proxy in parsed_proxies]
-    proxy_instances = ManualProxy(provider).add_proxies(proxies_data)
+    proxy_instances = ManualProxy(provider).add_proxies(proxies_data, votes)
     created = filter(lambda x: x.updated_at is None, proxy_instances)
     click.echo('Read {} proxies. {} new proxies have been created.'.format(len(parsed_proxies), len(list(created))))
 

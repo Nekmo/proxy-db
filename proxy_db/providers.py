@@ -130,7 +130,7 @@ class Provider(object):
     def process_page(self, request, session=None):
         return self.process_proxies(self.find_page_proxies(request), session)
 
-    def process_proxies(self, proxies, session=None):
+    def process_proxies(self, proxies, session=None, update_votes=UPDATE_VOTES):
         session = session or create_session()
         proxy_instances = []
         for proxy in proxies:
@@ -142,7 +142,7 @@ class Provider(object):
             if not instance.country:
                 detected_country = ip_country(get_domain(instance.id))
                 instance.country = detected_country or proxy.get('country_code') or ''
-            instance.votes += UPDATE_VOTES
+            instance.votes += update_votes
             proxy_instances.append(instance)
         session.commit()
         return proxy_instances
@@ -270,9 +270,9 @@ class ManualProxy(Provider):
     def get_provider_request(self, url, country):
         return ManualProxyRequest(self)
 
-    def add_proxies(self, proxies):
+    def add_proxies(self, proxies, update_votes=UPDATE_VOTES):
         session = create_session()
-        proxy_instances = self.process_proxies(proxies, session)
+        proxy_instances = self.process_proxies(proxies, session, update_votes)
         self.get_provider_request(None, None).add_proxies(proxy_instances, session)
         return proxy_instances
 
