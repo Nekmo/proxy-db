@@ -93,6 +93,39 @@ database configuration, by default ``sqlite:///{PROXY_DB_FILE}``.
 proxy-db uses sqlalchemy. For more information about how to configure the url to the database,
 `check its documentation <https://docs.sqlalchemy.org/en/13/core/engines.html>`_.
 
+Add proxies manually
+====================
+You can add one or more proxies per command line to insert them into the database. To add proxies::
+
+    $ proxy-db add[ <proxy_1>][ <proxy_2>][ <proxy_n>]
+
+For example::
+
+    $ proxy-db add http://5.0.0.0:8080 http://6.0.0.0:8080 http://7.0.0.0:8080
+
+You can also import proxies from a file, with one proxy per line::
+
+    $ proxy-db add --file <filename>
+
+For example::
+
+    $ proxy-db add --file proxies.txt
+
+You can also send the proxies stdin, one proxy per line::
+
+    $ proxy-db add < proxies.txt
+
+By default the proxies are created with the *"manual"* provider but this can be changed using the
+``--provider <provider_anem>`` parameter. For example::
+
+    $ proxy-db add --provider "my_provider" http://5.0.0.0:8080
+
+Added proxies have 10 positive votes by default. These votes will increase with successful requests and
+will decrease if the proxy fails. To change the default votes use the ``--votes <votes>`` parameter. For example::
+
+    $ proxy-db add --votes 50 http://5.0.0.0:8080
+
+
 Payment providers
 =================
 Some providers require a payment and additional steps to use.
