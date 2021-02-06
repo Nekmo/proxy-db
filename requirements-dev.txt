@@ -3,3 +3,4 @@ requests-mock
 bumpversion
 tox>=1.8
 codecov
+mock; python_version < '3.6'
