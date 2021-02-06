@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import string
-from itertools import filterfalse
 
 import click
 
 from proxy_db.providers import ManualProxy
-from proxy_db._compat import urlparse
+from proxy_db._compat import urlparse, filterfalse
 
 
 def proxy_is_valid(proxy):
