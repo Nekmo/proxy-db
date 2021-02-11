@@ -6,6 +6,10 @@ from proxy_db.models import Proxy, ProviderRequest, create_session
 from proxy_db.providers import PROVIDERS, ManualProxy
 
 
+class NONE:
+    pass
+
+
 class ProxiesList(object):
     def __init__(self, country=None, provider=None):
         if isinstance(country, six.string_types):
@@ -16,8 +20,8 @@ class ProxiesList(object):
         self._proxies = set()
         provider_name = provider
         if provider is not None and isinstance(provider, str):
-            provider = next(iter(filter(lambda x: x.name == provider, PROVIDERS)), None)
-        if provider is None:
+            provider = next(iter(filter(lambda x: x.name == provider, PROVIDERS)), NONE)
+        if provider is NONE:
             manual_provider_exists = create_session().query(
                 exists().where(ProviderRequest.provider == provider_name)
             ).scalar()

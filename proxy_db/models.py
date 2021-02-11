@@ -37,6 +37,7 @@ class ProviderRequest(Base):
         provider = next(filter(lambda x: x.name == self.provider, PROVIDERS), None)
         if provider is None:
             return ManualProxy(self.provider)
+        return provider
 
 
 class Proxy(Base):
