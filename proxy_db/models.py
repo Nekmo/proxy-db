@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from proxy_db._compat import urlparse
 
+
 PROXY_DB_FILE = os.environ.get('PROXY_DB_FILE', os.path.expanduser('~/.local/var/lib/proxy-db/db.sqlite3'))
 PROXY_DB_DB_URL = os.environ.get('PROXY_DB_DB_URL', 'sqlite:///{}'.format(PROXY_DB_FILE))
 PROTOCOLS = ['http', 'https']
@@ -32,8 +33,10 @@ class ProviderRequest(Base):
     proxies = relationship("Proxy", secondary=association_table, backref="provider_requests")
 
     def get_provider_instance(self):
-        from proxy_db.providers import PROVIDERS
-        return next(filter(lambda x: x.name == self.provider, PROVIDERS))
+        from proxy_db.providers import PROVIDERS, ManualProxy
+        provider = next(filter(lambda x: x.name == self.provider, PROVIDERS), None)
+        if provider is None:
+            return ManualProxy(self.provider)
 
 
 class Proxy(Base):

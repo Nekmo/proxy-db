@@ -88,19 +88,25 @@ class ProviderRequestBase(object):
 
 
 class ProviderCredentialMixin:
-    env_key_username =  None
+    env_key_username = None
     env_key_password = None
 
+    def get_env_key_username(self):
+        return self.env_key_username
+
+    def get_env_key_password(self):
+        return self.env_key_password
+
     def is_available(self):
-        return os.environ.get(self.env_key_username) and os.environ.get(self.env_key_password)
+        return self.has_credentials()
 
     def has_credentials(self):
-        return self.is_available()
+        return os.environ.get(self.get_env_key_username()) and os.environ.get(self.get_env_key_password())
 
     def credentials(self):
-        if not self.is_available():
+        if not self.has_credentials():
             return ()
-        return os.environ.get(self.env_key_username), os.environ.get(self.env_key_password)
+        return os.environ.get(self.get_env_key_username()), os.environ.get(self.get_env_key_password())
 
 
 class Provider(object):
@@ -258,14 +264,26 @@ class ManualProxyRequest(ProviderRequestBase):
     def __init__(self, provider):
         super(ManualProxyRequest, self).__init__(provider, '')
 
+    def now(self):
+        pass
 
-class ManualProxy(Provider):
+    def requires_update(self):
+        return False
+
+
+class ManualProxy(ProviderCredentialMixin, Provider):
     def __init__(self, provider):
         super(ManualProxy, self).__init__()
         self.name = provider
 
+    def get_env_key_username(self):
+        return 'PROXYDB_{}_USERNAME'.format(self.name.upper())
+
+    def get_env_key_password(self):
+        return 'PROXYDB_{}_PASSWORD'.format(self.name.upper())
+
     def is_available(self):
-        return False
+        return True
 
     def get_provider_request(self, url, country):
         return ManualProxyRequest(self)
