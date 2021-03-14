@@ -1,8 +1,13 @@
 import six
+from sqlalchemy import exists
 
 from proxy_db.exceptions import NoProvidersAvailable
 from proxy_db.models import Proxy, ProviderRequest, create_session
-from proxy_db.providers import PROVIDERS
+from proxy_db.providers import PROVIDERS, ManualProxy
+
+
+class NONE:
+    pass
 
 
 class ProxiesList(object):
@@ -13,9 +18,15 @@ class ProxiesList(object):
             country=country,
         )
         self._proxies = set()
+        provider_name = provider
         if provider is not None and isinstance(provider, str):
-            provider = next(iter(filter(lambda x: x.name == provider, PROVIDERS)), None)
-            assert provider is not None, "Invalid provider name."
+            provider = next(iter(filter(lambda x: x.name == provider, PROVIDERS)), NONE)
+        if provider is NONE:
+            manual_provider_exists = create_session().query(
+                exists().where(ProviderRequest.provider == provider_name)
+            ).scalar()
+            assert manual_provider_exists is True, "Invalid provider name."
+            provider = ManualProxy(provider_name)
         self.provider = provider
 
     def available_providers(self):
