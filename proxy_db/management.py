@@ -3,6 +3,7 @@ import string
 
 import click
 
+from proxy_db.models import Proxy, create_session
 from proxy_db.providers import ManualProxy
 from proxy_db._compat import urlparse, filterfalse
 
@@ -58,6 +59,14 @@ def add(file=None, votes=10, provider='manual', proxies=None):
     proxy_instances = ManualProxy(provider).add_proxies(proxies_data, votes)
     created = filter(lambda x: x.updated_at is None, proxy_instances)
     click.echo('Read {} proxies. {} new proxies have been created.'.format(len(parsed_proxies), len(list(created))))
+
+
+@cli.command()
+def list():
+    """List proxies registered in proxy-db.'"""
+    session = create_session()
+    proxies = session.query(Proxy).all()
+    click.echo('\n'.join(['{}'.format(proxy) for proxy in proxies]))
 
 
 if __name__ == '__main__':
