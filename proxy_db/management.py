@@ -3,6 +3,7 @@ import string
 
 import click
 
+from proxy_db.export import get_export_output
 from proxy_db.models import Proxy, create_session
 from proxy_db.providers import ManualProxy
 from proxy_db._compat import urlparse, filterfalse
@@ -62,11 +63,14 @@ def add(file=None, votes=10, provider='manual', proxies=None):
 
 
 @cli.command()
-def list():
+@click.option('--format', help='Output format to use. By default "line".',
+              default='line')
+def list(format):
     """List proxies registered in proxy-db.'"""
     session = create_session()
     proxies = session.query(Proxy).all()
-    click.echo('\n'.join(['{}'.format(proxy) for proxy in proxies]))
+    output = get_export_output(format, proxies)
+    click.echo(output)
 
 
 if __name__ == '__main__':

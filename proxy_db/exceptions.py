@@ -6,3 +6,7 @@ class ProxyDB(Exception):
 
 class NoProvidersAvailable(ProxyDB):
     pass
+
+
+class UnknownExportFormat(ProxyDB):
+    pass
