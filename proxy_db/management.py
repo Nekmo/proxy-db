@@ -70,7 +70,7 @@ def add(file=None, votes=10, provider='manual', proxies=None):
               default='')
 def list(format, columns):
     """List proxies registered in proxy-db.'"""
-    columns = [c.strip() for c in columns.split(',')]
+    columns = [c.strip() for c in columns.split(',')] if columns else []
     session = create_session()
     proxies = session.query(Proxy).all()
     output = get_export_output(format, proxies, columns)

@@ -4,9 +4,14 @@ import json
 from proxy_db.exceptions import UnknownExportFormat
 
 
+try:
+    import tabulate
+except ImportError:
+    tabulate = None
+
+
 DEFAULT_COLUMNS = [
     'id', 'votes', 'country', 'protocol', 'created_at', 'updated_at', 'on_provider_at',
-    'provider_requests__provider',
 ]
 
 
@@ -48,10 +53,15 @@ class LineOutput(OutputBase):
 
 class JsonOutput(OutputBase):
     name = 'json'
+    default_columns = OutputBase.default_columns + ['provider_requests__provider']
 
     def render(self):
         return json.dumps(list(self.get_rows()), cls=JsonEncoder, sort_keys=True, indent=4)
 
+
+class TabulateBaseOutput(OutputBase):
+    def render(self):
+        return tabulate.tabulate(self.get_rows(), headers="keys", tablefmt=self.name.split('-')[0])
 
 
 EXPORT_OUTPUTS = [
@@ -61,7 +71,15 @@ EXPORT_OUTPUTS = [
 
 
 def get_export_output_classes():
-    return EXPORT_OUTPUTS
+    classes = EXPORT_OUTPUTS
+    tabulate_formats = []
+    if tabulate is not None:
+        tabulate_formats = tabulate._table_formats.keys()
+    for tabulate_format in tabulate_formats:
+        class TabulateOutput(TabulateBaseOutput):
+            name = '{}-table'.format(tabulate_format)
+        classes.append(TabulateOutput)
+    return classes
 
 
 def get_export_output_class(name):
