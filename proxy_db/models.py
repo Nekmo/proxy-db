@@ -19,7 +19,18 @@ association_table = Table('proxy_provider_request', Base.metadata,
                           )
 
 
-class ProviderRequest(Base):
+class ModelMixin:
+    def get_param(self, name):
+        param_parts = name.split('__', 1)
+        param_value = getattr(self, param_parts[0])
+        if isinstance(param_value, (tuple, list)) and len(param_parts) > 1:
+            param_value = {value.get_param(param_parts[1]) for value in param_value}
+        elif len(param_parts) > 1:
+            param_value = param_value.param_parts(param_parts[1])
+        return param_value
+
+
+class ProviderRequest(ModelMixin, Base):
     __tablename__ = 'provider_requests'
     __table_args__ = (UniqueConstraint('provider', 'request_id', name='_provider_request_uc'),
                      )
@@ -40,7 +51,7 @@ class ProviderRequest(Base):
         return provider
 
 
-class Proxy(Base):
+class Proxy(ModelMixin, Base):
     __tablename__ = 'proxies'
     _proxies_list = None
 

@@ -1,11 +1,35 @@
+import datetime
+import json
+
 from proxy_db.exceptions import UnknownExportFormat
+
+
+DEFAULT_COLUMNS = [
+    'id', 'votes', 'country', 'protocol', 'created_at', 'updated_at', 'on_provider_at',
+    'provider_requests__provider',
+]
+
+
+class JsonEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
 
 
 class OutputBase:
     name = None
+    default_columns = DEFAULT_COLUMNS
 
-    def __init__(self, data):
+    def __init__(self, data, columns=None):
         self.data = data
+        self.columns = columns or self.default_columns
+
+    def get_rows(self):
+        for item in self.data:
+            yield {key: item.get_param(key) for key in self.columns}
 
     def render(self):
         raise NotImplementedError
@@ -18,12 +42,20 @@ class LineOutput(OutputBase):
     name = 'line'
 
     def render(self):
-        return '\n'.join(['{}'.format(line) for line in self.data])
+        return '\n'.join(['{}'.format(row) for row in self.get_rows()])
+
+
+class JsonOutput(OutputBase):
+    name = 'json'
+
+    def render(self):
+        return json.dumps(list(self.get_rows()), cls=JsonEncoder, sort_keys=True, indent=4)
 
 
 
 EXPORT_OUTPUTS = [
     LineOutput,
+    JsonOutput,
 ]
 
 
