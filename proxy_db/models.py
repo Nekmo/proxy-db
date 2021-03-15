@@ -27,6 +27,8 @@ class ModelMixin:
             param_value = {value.get_param(param_parts[1]) for value in param_value}
         elif len(param_parts) > 1:
             param_value = param_value.param_parts(param_parts[1])
+        elif callable(param_value):
+            param_value = param_value()
         return param_value
 
 

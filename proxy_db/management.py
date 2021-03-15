@@ -65,11 +65,15 @@ def add(file=None, votes=10, provider='manual', proxies=None):
 @cli.command()
 @click.option('--format', help='Output format to use. By default "line".',
               default='line')
-def list(format):
+@click.option('--columns', help='Command separated columns to output using format.'
+                                'You can use double low bar for related models.',
+              default='')
+def list(format, columns):
     """List proxies registered in proxy-db.'"""
+    columns = [c.strip() for c in columns.split(',')]
     session = create_session()
     proxies = session.query(Proxy).all()
-    output = get_export_output(format, proxies)
+    output = get_export_output(format, proxies, columns)
     click.echo(output)
 
 

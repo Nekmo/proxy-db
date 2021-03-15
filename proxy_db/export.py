@@ -40,9 +40,10 @@ class OutputBase:
 
 class LineOutput(OutputBase):
     name = 'line'
+    default_columns = ['proxy_with_credentials']
 
     def render(self):
-        return '\n'.join(['{}'.format(row) for row in self.get_rows()])
+        return '\n'.join([' '.join(row.values()) for row in self.get_rows()])
 
 
 class JsonOutput(OutputBase):
@@ -72,5 +73,5 @@ def get_export_output_class(name):
         ))
 
 
-def get_export_output(name, data):
-    return get_export_output_class(name)(data)
+def get_export_output(name, data, columns=None):
+    return get_export_output_class(name)(data, columns)
