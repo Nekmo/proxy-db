@@ -126,9 +126,9 @@ class Provider(object):
     def credentials(self):
         return ()
 
-    def request(self, url=None, country=None):
+    def request(self, url=None, country=None, protocol=None):
         url = url or self.base_url
-        return self.get_provider_request(url, country)
+        return self.get_provider_request(url, country, protocol)
 
     def find_page_proxies(self, request):
         return [{'proxy': proxy} for proxy in IP_PORT_PATTERN_GLOBAL.findall(request.text)]
@@ -153,8 +153,8 @@ class Provider(object):
         session.commit()
         return proxy_instances
 
-    def get_provider_request(self, url, country):
-        return ProviderRequestBase(self, url, options={'country': country})
+    def get_provider_request(self, url, country, protocol):
+        return ProviderRequestBase(self, url, options={'country': country, 'protocol': protocol})
 
     def lowercase_name(self):
         return self.name.lower().replace(' ', '_')
@@ -179,11 +179,11 @@ class ProxyNovaCom(SoupProvider):
     name = 'Proxy Nova'
     base_url = 'https://www.proxynova.com/proxy-server-list/'
 
-    def request(self, url=None, country=None):
+    def request(self, url=None, country=None, protocol=None):
         url = url or self.base_url
         if country:
             url += 'country-{}/'.format(country.lower())
-        return super(ProxyNovaCom, self).request(url, country)
+        return super(ProxyNovaCom, self).request(url, country, protocol)
 
     def soup_items(self, soup):
         return soup.select('tr[data-proxy-id]')
@@ -232,9 +232,9 @@ class NordVpn(ProviderCredentialMixin, Provider):
     env_key_username =  'PROXYDB_NORDVPN_USERNAME'
     env_key_password = 'PROXYDB_NORDVPN_PASSWORD'
 
-    def request(self, url=None, country=None):
+    def request(self, url=None, country=None, protocol=None):
         url = url or self.base_url
-        return super(NordVpn, self).request(url, country)
+        return super(NordVpn, self).request(url, country, protocol)
 
     def find_page_proxies(self, request):
         proxies = request.json()
@@ -285,13 +285,13 @@ class ManualProxy(ProviderCredentialMixin, Provider):
     def is_available(self):
         return True
 
-    def get_provider_request(self, url, country):
+    def get_provider_request(self, url, country, protocol):
         return ManualProxyRequest(self)
 
     def add_proxies(self, proxies, update_votes=UPDATE_VOTES):
         session = create_session()
         proxy_instances = self.process_proxies(proxies, session, update_votes)
-        self.get_provider_request(None, None).add_proxies(proxy_instances, session)
+        self.get_provider_request(None, None, None).add_proxies(proxy_instances, session)
         return proxy_instances
 
 

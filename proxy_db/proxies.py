@@ -11,11 +11,12 @@ class NONE:
 
 
 class ProxiesList(object):
-    def __init__(self, country=None, provider=None):
+    def __init__(self, country=None, provider=None, protocol=None):
         if isinstance(country, six.string_types):
             country = country.upper()
         self.request_options = dict(
             country=country,
+            protocol=protocol,
         )
         self._proxies = set()
         provider_name = provider
@@ -46,8 +47,11 @@ class ProxiesList(object):
             # Proxy.provider_requests.provider.in_(self.available_providers())
         ).order_by(Proxy.votes.desc())
         country = self.request_options['country']
+        protocol = self.request_options['protocol']
         if country:
             query = query.filter(Proxy.country == country)
+        if protocol:
+            query = query.filter(Proxy.protocol == protocol)
         proxy = query.first()
         if proxy is not None:
             proxy._set_providers()
