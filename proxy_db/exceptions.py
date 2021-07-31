@@ -10,3 +10,7 @@ class NoProvidersAvailable(ProxyDB):
 
 class UnknownExportFormat(ProxyDB):
     pass
+
+
+class UnsupportedEngine(ProxyDB):
+    pass
