@@ -3,7 +3,7 @@ import unittest
 from proxy_db.providers import ProxyNovaCom, PROVIDERS
 from ._compat import patch, Mock
 
-from proxy_db.proxies import ProxiesList
+from proxy_db.proxies import ProxiesList, RandomListingStrategy
 
 
 class TestProxiesList(unittest.TestCase):
@@ -21,6 +21,13 @@ class TestProxiesList(unittest.TestCase):
 
     @patch('proxy_db.proxies.create_session')
     def test_find_db_proxy(self, m):
+        m.return_value.query.return_value.join.return_value.filter\
+            .return_value.session.get_bind.return_value.name = 'sqlite'
+        ProxiesList(strategy=RandomListingStrategy).find_db_proxy()
+        m.assert_called_once()
+
+    @patch('proxy_db.proxies.create_session')
+    def test_random_find_db_proxy(self, m):
         ProxiesList().find_db_proxy()
         m.assert_called_once()
 
