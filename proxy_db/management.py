@@ -34,7 +34,7 @@ def cli():
     pass
 
 
-@cli.command()
+@cli.command(name='add')
 @click.option('--file', help='Path to the file with the proxies.',
               type=click.File('r'), required=False)
 @click.option('--votes', default=10, type=int,
@@ -42,7 +42,7 @@ def cli():
 @click.option('--provider', default='manual', type=str,
               help='Provider name for proxies. It allows to know the origin of the proxies and search by provider.')
 @click.argument('proxies', type=str, required=False, nargs=-1)
-def add(file=None, votes=10, provider='manual', proxies=None):
+def add_command(file=None, votes=10, provider='manual', proxies=None):
     """Add proxies in <protocol>://<address>:<port> format or <protocol>://<username>:<password>@<address>:<port>
     format.'"""
     if not file and not proxies:
@@ -63,7 +63,7 @@ def add(file=None, votes=10, provider='manual', proxies=None):
     click.echo('Read {} proxies. {} new proxies have been created.'.format(len(parsed_proxies), len(list(created))))
 
 
-@cli.command()
+@cli.command(name='list')
 @click.option('--format', help='Output format to use. By default "line". '
                                'Options: {}'.format(', '.join([x.name for x in get_export_output_classes()])),
               default='line')
@@ -74,7 +74,7 @@ def add(file=None, votes=10, provider='manual', proxies=None):
 @click.option('--country', help='2 character country code to filter. For example US.', default='')
 @click.option('--protocol', help='Proxy protocol name. Examples: http, https, socks5.', default='')
 @click.option('--provider', help='Provider name to filter.', default='')
-def list(format, columns, min_votes, country, protocol, provider):
+def list_command(format, columns, min_votes, country, protocol, provider):
     """List proxies registered in proxy-db.'"""
     columns = [c.strip() for c in columns.split(',')] if columns else []
     session = create_session()
