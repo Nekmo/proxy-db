@@ -115,23 +115,6 @@ class ProxiesList(object):
             query = query.filter(Proxy.protocol == protocol)
         return self.strategy.next(query)
 
-        # query = create_session().query(Proxy).filter(Proxy.votes > 0)
-        # query = query.join(Proxy.provider_requests).filter(
-        #     ~Proxy.id.in_(self._excluded_proxies()),
-        #     ProviderRequest.provider.in_([x.name for x in self.available_providers()]),
-        #     # Proxy.provider_requests.provider.in_(self.available_providers())
-        # ).order_by(Proxy.votes.desc())
-        # country = self.request_options['country']
-        # protocol = self.request_options['protocol']
-        # if country:
-        #     query = query.filter(Proxy.country == country)
-        # if protocol:
-        #     query = query.filter(Proxy.protocol == protocol)
-        # proxy = query.first()
-        # if proxy is not None:
-        #     proxy._set_providers()
-        # return proxy
-
     def find_provider(self):
         for provider in self.available_providers():
             req = provider.request(**self.request_options)
