@@ -4,7 +4,7 @@ import string
 import click
 
 from proxy_db.export import get_export_output
-from proxy_db.models import Proxy, create_session
+from proxy_db.models import Proxy, create_session, ProviderRequest
 from proxy_db.providers import ManualProxy
 from proxy_db._compat import urlparse, filterfalse
 
@@ -66,13 +66,27 @@ def add(file=None, votes=10, provider='manual', proxies=None):
 @click.option('--format', help='Output format to use. By default "line".',
               default='line')
 @click.option('--columns', help='Command separated columns to output using format.'
-                                'You can use double low bar for related models.',
-              default='')
-def list(format, columns):
+                                'You can use double low bar for related models.', default='')
+@click.option('--min-votes', type=int, help='Minimum votes of proxies to list.', default=None)
+@click.option('--country', help='2 character country code to filter. For example US.', default='')
+@click.option('--protocol', help='Proxy protocol name. Examples: http, https, socks5.', default='')
+@click.option('--provider', help='Provider name to filter.', default='')
+def list(format, columns, min_votes, country, protocol, provider):
     """List proxies registered in proxy-db.'"""
     columns = [c.strip() for c in columns.split(',')] if columns else []
     session = create_session()
-    proxies = session.query(Proxy).all()
+    proxies = session.query(Proxy)
+    if min_votes is not None:
+        proxies = proxies.filter(Proxy.votes > min_votes)
+    if country:
+        proxies = proxies.filter(Proxy.country == country.upper())
+    if protocol:
+        proxies = proxies.filter(Proxy.protocol == protocol.lower())
+    if provider:
+        proxies = proxies.join(Proxy.provider_requests).filter(
+            ProviderRequest.provider == provider,
+        )
+    proxies = proxies.all()
     output = get_export_output(format, proxies, columns)
     click.echo(output)
 

@@ -11,8 +11,16 @@ except ImportError:
 
 
 DEFAULT_COLUMNS = [
-    'id', 'votes', 'country', 'protocol', 'created_at', 'updated_at', 'on_provider_at',
+    'id', 'votes', 'country', 'protocol', 'created_at', 'updated_at', 'on_provider_at', 'providers'
 ]
+
+
+def value_to_string(value):
+    if isinstance(value, set):
+        return ', '.join(value)
+    elif isinstance(value, int):
+        return f'{value}'
+    return value
 
 
 class JsonEncoder(json.JSONEncoder):
@@ -34,7 +42,8 @@ class OutputBase:
 
     def get_rows(self):
         for item in self.data:
-            yield {key: item.get_param(key) for key in self.columns}
+            item._set_providers()
+            yield {key: value_to_string(item.get_param(key)) for key in self.columns}
 
     def render(self):
         raise NotImplementedError
