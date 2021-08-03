@@ -84,6 +84,24 @@ To force the country of the proxies use the country code in ``ProxiesList``:
 Countries use `the 2-character iso code <https://countrycode.org/>`_.
 
 
+Change list strategy
+====================
+By default proxy-db sorts proxies by votes and only returns those with more than 1 vote (ignore with negative votes).
+There are other strategies available like returning random proxies:
+
+.. code-block::
+
+    >>> from proxy_db.proxies import ProxiesList, RandomListingStrategy
+    >>> p = next(ProxiesList(strategy=RandomListingStrategy))
+
+It is also possible to change the default strategy options:
+
+.. code-block::
+
+    >>> from proxy_db.proxies import ProxiesList, VotesListingStrategy
+    >>> p = next(ProxiesList(strategy=VotesListingStrategy(min_votes=-5)))
+
+
 Change database
 ---------------
 To change the path to the sqlite database define the environment variable ``PROXY_DB_FILE``, by default

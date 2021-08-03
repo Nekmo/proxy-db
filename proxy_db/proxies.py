@@ -50,11 +50,12 @@ class ListingStrategy(object):
 
 
 class VotesListingStrategy(ListingStrategy):
-    def __init__(self, filters=None):
+    def __init__(self, filters=None, min_votes=0):
         super().__init__(filters, Proxy.votes.desc())
+        self.min_votes = min_votes
 
     def get_default_filters(self):
-        return [Proxy.votes > 0]
+        return [Proxy.votes >= self.min_votes]
 
 
 class RandomListingStrategy(ListingStrategy):
