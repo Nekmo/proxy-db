@@ -3,9 +3,10 @@ import string
 
 import click
 
-from proxy_db.export import get_export_output
+from proxy_db.export import get_export_output, DEFAULT_COLUMNS
 from proxy_db.models import Proxy, create_session, ProviderRequest
 from proxy_db.providers import ManualProxy
+from proxy_db.export import get_export_output_classes
 from proxy_db._compat import urlparse, filterfalse
 
 
@@ -63,10 +64,12 @@ def add(file=None, votes=10, provider='manual', proxies=None):
 
 
 @cli.command()
-@click.option('--format', help='Output format to use. By default "line".',
+@click.option('--format', help='Output format to use. By default "line". '
+                               'Options: {}'.format(', '.join([x.name for x in get_export_output_classes()])),
               default='line')
 @click.option('--columns', help='Command separated columns to output using format.'
-                                'You can use double low bar for related models.', default='')
+                                'You can use double low bar for related models. '
+                                'Choices: {}'.format(', '.join(DEFAULT_COLUMNS)), default='')
 @click.option('--min-votes', type=int, help='Minimum votes of proxies to list.', default=None)
 @click.option('--country', help='2 character country code to filter. For example US.', default='')
 @click.option('--protocol', help='Proxy protocol name. Examples: http, https, socks5.', default='')

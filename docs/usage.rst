@@ -144,6 +144,51 @@ will decrease if the proxy fails. To change the default votes use the ``--votes 
     $ proxy-db add --votes 50 http://5.0.0.0:8080
 
 
+List proxies
+============
+To list all the proxies already available you can use the following command::
+
+    $ proxy-db list
+    http://185.146.167.226:1080
+    http://185.89.182.32:86
+    http://186.28.217.19:80
+    http://185.116.137.248:1080
+    http://185.176.129.14:1080
+    ...
+
+
+By default the proxies will be listed line by line as in the previous example. You can change the format
+using ``--format <format>``. Available options: line, json. More options are available by installing
+the ``tabulate`` package using ``pip install tabulate``. To see all the options after installing
+*tabulate* use ``proxy-db list --help``.
+
+.. code-block:: shell
+
+    $ proxy-db list --format json
+
+
+It is also possible to choose the columns to display. To see the available columns use ``proxy-db list --help``::
+
+    $ proxy-db list --columns <column1[,<column2>]>
+
+
+For example::
+
+    $ proxy-db list --columns id,votes,country,protocol,providers
+
+
+Proxies can be filtered using various options::
+
+    $ proxy list[ --min-votes <votes>][ --country <country code>]
+                [ --protocol <protocol>][ --provider <provider>]
+
+
+For example::
+
+    $ proxy list --min-votes 10 --country ES \
+                 --protocol https --provider "Nord VPN"
+
+
 Payment providers
 =================
 Some providers require a payment and additional steps to use.
