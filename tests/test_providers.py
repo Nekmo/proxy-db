@@ -177,7 +177,7 @@ class TestProvider(unittest.TestCase):
         country = 'es'
         provider_request = Provider(self.url).request(self.url, country)
         self.assertEqual(provider_request.url, self.url)
-        self.assertEqual(provider_request.options, {'country': country})
+        self.assertEqual(provider_request.options, {'country': country, 'protocol': None})
 
     def test_find_page_proxies(self):
         request = Mock()
@@ -199,14 +199,14 @@ class TestProxyNovaCom(unittest.TestCase):
     def test_request(self, m):
         provider = ProxyNovaCom()
         provider.request(self.url)
-        m.assert_called_with(self.url, None)
+        m.assert_called_with(self.url, None, None)
 
     @patch("proxy_db.providers.Provider.request")
     def test_request_country(self, m):
         provider = ProxyNovaCom()
         country = 'es'
         provider.request(self.url, country)
-        m.assert_called_with(self.url + 'country-{}/'.format(country), country)
+        m.assert_called_with(self.url + 'country-{}/'.format(country), country, None)
 
     def test_find_page_proxies(self):
         provider = ProxyNovaCom()
@@ -248,7 +248,7 @@ class TestNordVPN(unittest.TestCase):
     def test_request(self, m):
         provider = NordVpn()
         provider.request(self.url)
-        m.assert_called_with(self.url, None)
+        m.assert_called_with(self.url, None, None)
 
     def test_find_page_proxies(self):
         provider = NordVpn()
