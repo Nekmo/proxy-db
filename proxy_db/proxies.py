@@ -71,7 +71,9 @@ class RandomListingStrategy(ListingStrategy):
         elif engine_name == 'oracle':
             return 'dbms_random.value'
         else:
-            raise UnsupportedEngine(f'{engine_name} engine does not support random ordering.')
+            raise UnsupportedEngine(
+                '{engine_name} engine does not support random ordering.'.format(**locals())
+            )
 
 
 class ProxiesList(object):
