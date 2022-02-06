@@ -19,7 +19,7 @@ def value_to_string(value):
     if isinstance(value, set):
         return ', '.join(value)
     elif isinstance(value, int):
-        return f'{value}'
+        return str(value)
     return value
 
 
