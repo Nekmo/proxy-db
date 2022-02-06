@@ -1,8 +1,11 @@
+import datetime
 import unittest
 
 from click.testing import CliRunner
 
+from proxy_db.exceptions import UnknownExportFormat
 from proxy_db.management import add_command, list_command
+from proxy_db.models import Proxy
 from tests._compat import patch
 
 
@@ -28,8 +31,40 @@ class TestAdd(unittest.TestCase):
 class TestList(unittest.TestCase):
 
     @patch('proxy_db.management.create_session')
-    def test_invalid_proxy(self, m):
+    def test_lines_list_with_options(self, m):
         CliRunner().invoke(list_command, [
             '--min-votes', '10', '--country', 'ES',
             '--protocol', 'https', '--provider', 'Nord VPN'
         ])
+
+    @patch('proxy_db.management.create_session')
+    def test_line_format(self, m):
+        m.return_value.query.return_value.all.return_value = [
+            Proxy(created_at=datetime.datetime.now()),
+        ]
+        CliRunner().invoke(list_command)
+
+    @patch('proxy_db.management.create_session')
+    def test_json_format(self, m):
+        m.return_value.query.return_value.all.return_value = [
+            Proxy(),
+        ]
+        CliRunner().invoke(list_command, [
+            '--format', 'json',
+        ])
+
+    @patch('proxy_db.management.create_session')
+    def test_table_format(self, m):
+        m.return_value.query.return_value.all.return_value = [
+            Proxy(),
+        ]
+        CliRunner().invoke(list_command, [
+            '--format', 'grid-table',
+        ])
+
+    @patch('proxy_db.management.create_session')
+    def test_invalid_format(self, m):
+        result = CliRunner().invoke(list_command, [
+            '--format', 'invalid',
+        ])
+        self.assertIsInstance(result.exception, UnknownExportFormat)
